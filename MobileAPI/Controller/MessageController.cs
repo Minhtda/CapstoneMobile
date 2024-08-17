@@ -67,7 +67,7 @@ namespace MobileAPI.Controllers
         }
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> sendMessageTest(Guid roomId, string messageContent)
+        public async Task<IActionResult> sendMessage(Guid roomId, string messageContent)
         {
             var userId = _claimService.GetCurrentUserId;
             if (userId == Guid.Empty)
