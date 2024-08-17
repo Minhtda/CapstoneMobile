@@ -18,7 +18,7 @@ namespace MobileAPI.Controllers
         private readonly IPostService _postService;
         private readonly IClaimService _claimService;
         public MessageController(IMessageService messageService, IHubContext<ChatHub> hubContext, IOrderService orderService, 
-            IPostService postService, ClaimService claimService)
+            IPostService postService, IClaimService claimService)
         {
             _messageService = messageService;
             _hubContext = hubContext;
