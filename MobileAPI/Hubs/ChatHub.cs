@@ -26,7 +26,7 @@ namespace MobileAPI.Hubs
         public async Task SendMessageToRoom(Guid roomId, string messageContent)
         {
             var userId = _claimService.GetCurrentUserId;
-            /*if (userId == Guid.Empty)
+            if (userId == Guid.Empty)
             {
                 throw new HubException("Invalid user ID.");
             }
@@ -45,11 +45,6 @@ namespace MobileAPI.Hubs
             };
 
             var message = await _messageService.CreateMessage(createMessageModel);
-            if (message.CreatedBy == null)
-            {
-                return;
-            }
-*/
             await Clients.Group(roomId.ToString()).SendAsync("ReceiveMessage", userId.ToString(), messageContent);
         }
         [Authorize]
