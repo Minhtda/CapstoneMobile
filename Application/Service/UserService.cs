@@ -183,7 +183,8 @@ namespace Application.Service
             }
             try
             {
-                key = StringUtil.RandomString(6);
+                /* key = StringUtil.RandomString(6);*/
+                key = "1234";
                 //Get project's directory and fetch ForgotPasswordTemplate content from EmailTemplate
                 string exePath = Environment.CurrentDirectory.ToString();
                 string FilePath = exePath + @"/EmailTemplate/ForgotPassword.html";
