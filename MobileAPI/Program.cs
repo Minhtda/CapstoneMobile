@@ -10,6 +10,7 @@ using System.Reflection;
 using MobileAPI.Middleware;
 using Infrastructure;
 using Infrastructure.MapperConfig;
+using Microsoft.AspNetCore.Http.Connections;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -94,6 +95,7 @@ if (app.Environment.IsProduction())
     });
     app.ApplyMigration();
 }
+app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
@@ -114,7 +116,10 @@ app.UseHangfireDashboard();
 
 app.MapControllers();
 //Map chathub
-app.MapHub<ChatHub>("/chatHub");
+app.MapHub<ChatHub>("/chatHub", options =>
+{
+    options.Transports = HttpTransportType.WebSockets | HttpTransportType.LongPolling;
+});
 //Call hangfire
 await app.StartAsync();
 RecurringJob.AddOrUpdate<ISubcriptionService>(sub => sub.ExtendSubscription(), "0 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
