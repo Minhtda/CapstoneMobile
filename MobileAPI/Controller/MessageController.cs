@@ -89,7 +89,7 @@ namespace MobileAPI.Controllers
             };
 
             var message = await _messageService.CreateMessage(createMessageModel);
-            if (message.CreatedBy == null)
+            if (message == false)
             {
                 return BadRequest();
             }

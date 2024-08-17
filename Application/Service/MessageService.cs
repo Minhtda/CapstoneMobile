@@ -27,14 +27,13 @@ namespace Application.Service
             _claimService = claimService;
         }
 
-        public async Task<Message> CreateMessage(CreateMessageModel messageModel)
+        public async Task<bool> CreateMessage(CreateMessageModel messageModel)
         {
             var newMessage = _mapper.Map<Message>(messageModel);
             newMessage.CreationDate = DateTime.UtcNow;
             newMessage.CreatedBy = messageModel.CreatedBy;
             await _unitOfWork.MessageRepository.AddAsync(newMessage);
-            await _unitOfWork.SaveChangeAsync();
-            return newMessage;
+            return await _unitOfWork.SaveChangeAsync() > 0;
         }
 
         public async Task<bool> DeleteMessage(Guid messageId)
