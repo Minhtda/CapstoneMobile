@@ -3,13 +3,13 @@ using Application.InterfaceService;
 using Application.SchemaFilter;
 using Application.VnPay.Config;
 using Hangfire;
-using Infrastructure.Mappers;
 using Microsoft.OpenApi.Models;
 using MobileAPI.Hubs;
 using MobileAPI;
 using System.Reflection;
 using MobileAPI.Middleware;
 using Infrastructure;
+using Infrastructure.MapperConfig;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -20,7 +20,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructureService(configuration!.DatabaseConnectionString);
 builder.Services.AddMobileAPIService(configuration!.JWTSecretKey);
-builder.Services.AddAutoMapper(typeof(MapperConfig));
+builder.Services.AddAutoMapper(typeof(MapperConfiguration));
 builder.Services.AddSingleton(configuration);
 builder.Services.Configure<VnPayConfig>(builder.Configuration.GetSection(VnPayConfig.ConfigName));
 builder.Services.AddHangfire(configuration => configuration
@@ -52,9 +52,9 @@ builder.Services.AddSwaggerGen(opt =>
                 new string[]{}
             }
      });
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+/*    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    opt.IncludeXmlComments(xmlPath);
+    opt.IncludeXmlComments(xmlPath);*/
     opt.SchemaFilter<RegisterSchemaFilter>();
 });
 builder.Services.AddHangfireServer();

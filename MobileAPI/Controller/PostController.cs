@@ -1,6 +1,5 @@
 ﻿using Application.InterfaceService;
 using Application.Service;
-using Application.ViewModel.CriteriaModel;
 using Application.ViewModel.PostModel;
 using Application.ViewModel.ProductModel;
 using Domain.Entities;
