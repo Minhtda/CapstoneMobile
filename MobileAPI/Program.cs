@@ -92,6 +92,7 @@ if (app.Environment.IsProduction())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Backend API");
 
     });
+    app.ApplyMigration();
 }
 app.UseCors("AllowAll");
 app.UseAuthentication();
