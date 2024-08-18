@@ -11,5 +11,6 @@ namespace Application.InterfaceRepository
     {
         Task<List<Message>> GetMessagesBy2UserId(Guid user1, Guid user2);
         Task<Message> getByContent(string messageContent);
+        Task AddMessageAsync(Message entity);
     }
 }

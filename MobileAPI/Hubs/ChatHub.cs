@@ -23,13 +23,14 @@ namespace MobileAPI.Hubs
             _userService = userService;
         }
         [Authorize]
-        public async Task SendMessageToRoom(Guid userId, Guid roomId, string messageContent)
+        public async Task SendMessageToRoom(Guid roomId, string messageContent)
         {
+            var user = await _userService.GetCurrentLoginUser();
+            var userId = user.Userid;
             if (userId == Guid.Empty)
             {
                 throw new HubException("Invalid user ID.");
             }
-
             var room = await _messageService.GetChatRoomByIdAsync(roomId);
             if (room == null)
             {
