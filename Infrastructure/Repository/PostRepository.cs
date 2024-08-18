@@ -43,7 +43,7 @@ namespace Infrastructure.Repository
                     PostContent = x.PostContent,
                     PostTitle = x.PostTitle,
                     CreationDate = DateOnly.FromDateTime(x.CreationDate.Value),
-                    AuthorId = x.CreatedBy.Value,
+                    AuthorId = x.UserId,
                     Location=x.Author.HomeAddress,
                     Product = new ProductModel
                     {
