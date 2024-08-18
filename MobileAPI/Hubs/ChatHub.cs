@@ -26,12 +26,8 @@ namespace MobileAPI.Hubs
         [Authorize]
         public async Task SendMessageToRoom(Guid roomId, string messageContent)
         {
-            var userId = Context.User?.FindFirstValue("userId");
-
-            if (string.IsNullOrEmpty(userId) || userId == Guid.Empty.ToString())
-            {
-                throw new HubException("Invalid user");
-            }
+            var httpContext = Context.GetHttpContext();
+            var userId = httpContext?.User?.FindFirstValue("userId");
             var userGuid = Guid.Parse(userId);
             var room = await _messageService.GetChatRoomByIdAsync(roomId);
             if (room == null)
