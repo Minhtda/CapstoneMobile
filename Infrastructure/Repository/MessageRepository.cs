@@ -15,9 +15,11 @@ namespace Infrastructure.Repository
     public class MessageRepository : GenericRepository<Message>, IMessageRepository
     {
         private readonly AppDbContext _appDbContext;
+        private readonly ICurrentTime _currentTime;
         public MessageRepository(AppDbContext appDbContext, IClaimService claimService, ICurrentTime currentTime) : base(appDbContext, claimService, currentTime)
         {
             _appDbContext = appDbContext;
+            _currentTime = currentTime;
         }
 
         public async Task<Message> getByContent(string messageContent)
@@ -35,6 +37,12 @@ namespace Infrastructure.Repository
                                                                     Where(x => x.IsDelete == false).ToListAsync();
             return messages;*/
            throw new NotImplementedException();
+        }
+        public async Task AddMessageAsync(Message entity)
+        {
+            entity.CreationDate = _currentTime.GetCurrentTime();
+            entity.IsDelete = false;
+            await _dbSet.AddAsync(entity);
         }
     }
 }
