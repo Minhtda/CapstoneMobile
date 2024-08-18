@@ -13,7 +13,7 @@ namespace Application.InterfaceService
     {
         Task<List<Message>> GetAllMessages();
         Task<Message> GetMessageById(Guid id);
-        Task<Message> CreateMessage(CreateMessageModel message);
+        Task<bool> CreateMessage(CreateMessageModel message);
         Task<bool> UpdateMessage(UpdateMessageModel message);
         Task<bool> DeleteMessage(Guid id);
         Task<ChatRoomWithOrder> GetOrCreateChatRoomAsync(Guid receiverId, Guid postId);

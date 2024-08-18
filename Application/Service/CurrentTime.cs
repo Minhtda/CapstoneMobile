@@ -9,7 +9,11 @@ namespace Application.Service
 {
     public class CurrentTime : ICurrentTime
     {
-        public DateTime GetCurrentTime() => DateTime.UtcNow;
-       
+        public DateTime GetCurrentTime()
+        {
+            TimeZoneInfo vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
+        }
+
     }
 }
