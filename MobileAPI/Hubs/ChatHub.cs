@@ -4,6 +4,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 
 namespace MobileAPI.Hubs
@@ -25,12 +26,13 @@ namespace MobileAPI.Hubs
         [Authorize]
         public async Task SendMessageToRoom(Guid roomId, string messageContent)
         {
-            var user = await _userService.GetCurrentLoginUser();
-            var userId = user.Userid;
-            if (userId == Guid.Empty)
+            var userId = Context.User?.FindFirstValue("userId");
+
+            if (string.IsNullOrEmpty(userId) || userId == Guid.Empty.ToString())
             {
-                throw new HubException("Invalid user ID.");
+                throw new HubException("Invalid user");
             }
+            var userGuid = Guid.Parse(userId);
             var room = await _messageService.GetChatRoomByIdAsync(roomId);
             if (room == null)
             {
@@ -41,7 +43,7 @@ namespace MobileAPI.Hubs
             {
                 MessageContent = messageContent,
                 RoomId = roomId,
-                CreatedBy = userId
+                CreatedBy = userGuid
             };
 
             var message = await _messageService.CreateMessage(createMessageModel);

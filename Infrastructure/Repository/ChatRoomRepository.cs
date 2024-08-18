@@ -20,16 +20,38 @@ namespace Infrastructure.Repository
         {
             _appDbContext = appDbContext;
         }
-
         public async Task<List<ChatRoomWithOrder>> GetByUserIdAsync(Guid userId)
         {
+            // Fetch only the required fields using projection to reduce memory overhead
             var rooms = await _appDbContext.ChatRooms
-                                    .Where(m => m.SenderId == userId || m.ReceiverId == userId)
-                                    .Where(x => x.IsDelete == false)
-                                    .Include(c => c.Messages) 
-                                    .Include(c => c.Receiver) 
-                                    .Include(c => c.Sender)
-                                    .OrderByDescending(c => c.Messages.Max(m => m.CreationDate))
+                                    .Where(m => (m.SenderId == userId || m.ReceiverId == userId) && m.IsDelete == false)
+                                    .Select(room => new
+                                    {
+                                        room.Id,
+                                        room.SenderId,
+                                        room.ReceiverId,
+                                        SenderUserName = room.Sender.UserName,
+                                        ReceiverUserName = room.Receiver.UserName,
+                                        SenderAvatar = room.Sender.ProfileImage,
+                                        ReceiverAvatar = room.Receiver.ProfileImage,
+                                        Messages = room.Messages
+                                                    .OrderByDescending(m => m.CreationDate)
+                                                    .Select(m => new
+                                                    {
+                                                        m.Id,
+                                                        m.MessageContent,
+                                                        m.CreatedBy,
+                                                        m.CreationDate
+                                                    }).ToList(),
+                                        Orders = _appDbContext.Orders
+                                                    .Where(o => o.Post.CreatedBy == room.ReceiverId && o.UserId == room.SenderId)
+                                                    .Select(o => new
+                                                    {
+                                                        o.Id,
+                                                        o.OrderStatusId
+                                                    }).ToList()
+                                    })
+                                    .AsNoTracking() // Improves performance for read-only data
                                     .ToListAsync();
 
             // Map entities to DTOs
@@ -38,31 +60,27 @@ namespace Infrastructure.Repository
                 roomId = room.Id,
                 SenderId = room.SenderId,
                 ReceiverId = room.ReceiverId,
-                ReceiverName = room.Receiver.UserName,
-                SenderName = room.Sender.UserName,
-                SenderAvatar = room.Sender.ProfileImage,
-                ReceiverAvatar = room.Receiver.ProfileImage,
-                // Map other properties as needed
+                SenderName = room.SenderUserName,
+                ReceiverName = room.ReceiverUserName,
+                SenderAvatar = room.SenderAvatar,
+                ReceiverAvatar = room.ReceiverAvatar,
                 Messages = room.Messages.Select(message => new MessageDto
                 {
                     messageId = message.Id,
                     Content = message.MessageContent,
                     CreatedBy = message.CreatedBy,
-                    CreatedDate = message.CreationDate.Value.ToShortDateString(),
-                    CreatedTime = message.CreationDate.Value.ToShortTimeString()
-                    // Map other properties as needed
+                    CreatedDate = message.CreationDate?.ToShortDateString(),
+                    CreatedTime = message.CreationDate?.ToShortTimeString()
                 }).ToList(),
-                Order = _appDbContext.Orders
-                .Where(o => o.Post.CreatedBy == room.ReceiverId)
-                .Where(o => o.UserId == room.SenderId).AsSplitQuery().Select(u => new OrderDto
+                Order = room.Orders.Select(order => new OrderDto
                 {
-                    OrderId = u.Id,
-                    OrderStatusId = u.OrderStatusId
+                    OrderId = order.Id,
+                    OrderStatusId = order.OrderStatusId
                 }).ToList()
             }).ToList();
+
             return roomDtos;
         }
-
         public async Task<ChatRoomWithOrder> GetMessagesByRoomId(Guid roomId)
         {
             var chatRoom = await _appDbContext.ChatRooms.Where(m => m.Id == roomId).
