@@ -46,9 +46,11 @@ namespace Application.Service
                     var subscriptionHistory = await _unitOfWork.SubscriptionHistoryRepository.GetByIdAsync(subscriptionHistoryViewModel.Id);
                     if (subscriptionHistory.IsExtend == false)
                     {
+                        return false;
                     }
                     if (subscriptionHistory.EndDate < DateTime.UtcNow)
                     {
+                        return false;
                     }
                     else
                     {
