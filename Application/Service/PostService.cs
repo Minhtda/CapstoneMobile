@@ -174,6 +174,13 @@ namespace Application.Service
                         UserId = _claimService.GetCurrentUserId,
                         IsPriority = false,
                     };
+                    var walletTransaction = new WalletTransaction()
+                    {
+                        TransactionType = "Buy post",
+                        Amount = amount,
+                        WalletId = userWallet.Id
+                    };
+                    await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
                     await _unitOfWork.PostRepository.AddAsync(createPost);
                     _unitOfWork.WalletRepository.Update(userWallet);
                     await _unitOfWork.SaveChangeAsync();
