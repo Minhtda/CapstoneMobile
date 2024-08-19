@@ -31,7 +31,7 @@ namespace Infrastructure.Repository
             // Get the prioritized posts and randomize them
             var prioritizedPosts = await _appDbContext.Posts
                 .Where(x => x.IsDelete == false && x.CreatedBy != userId && x.IsPriority == true)
-                .OrderBy(x => Guid.NewGuid()) // Randomize
+                 // Randomize
                 .Include(x => x.Product)
                     .ThenInclude(p => p.Category)
                 .Include(x => x.Product)
@@ -120,7 +120,7 @@ namespace Infrastructure.Repository
             // Randomize the prioritized posts (IsPriority == true)
             var prioritizedPosts = posts
                 .Where(p => p.IsPriority == true)
-                .OrderBy(p => Guid.NewGuid());
+                ;
 
             // Sort the non-prioritized posts (IsPriority is false or null) by CreationDate
             var nonPrioritizedPosts = posts
@@ -141,7 +141,7 @@ namespace Infrastructure.Repository
             // Randomize the prioritized posts (IsPriority == true)
             var prioritizedPosts = posts
                 .Where(p => p.IsPriority == true && p.CreatedBy != currentUserId)
-                .OrderBy(p => Guid.NewGuid());
+                ;
 
             // Sort the non-prioritized posts (IsPriority is false or null) by CreationDate
             var nonPrioritizedPosts = posts
@@ -201,7 +201,7 @@ namespace Infrastructure.Repository
             var prioritizedPosts = await _appDbContext.Posts
                 .Where(x => x.PostTitle.Contains(productName) && x.IsDelete == false && x.IsPriority == true)
                 .AsSplitQuery()
-                .OrderBy(x => Guid.NewGuid()) // Randomize
+                 // Randomize
                 .Include(x => x.Product).ThenInclude(p => p.Category).AsSplitQuery()
                 .Include(x => x.Product).ThenInclude(p => p.ConditionType).AsSplitQuery()
                 .Select(x => new PostViewModel
@@ -273,7 +273,7 @@ namespace Infrastructure.Repository
             // Randomize the prioritized posts (IsPriority == true)
             var prioritizedPosts = filteredPosts
                 .Where(p => p.IsPriority == true)
-                .OrderBy(p => Guid.NewGuid())
+                
                 .ToList();
 
             // Sort the non-prioritized posts (IsPriority is false or null) by CreationDate
@@ -332,7 +332,7 @@ namespace Infrastructure.Repository
                 return await _appDbContext.Posts.Where(x => x.IsDelete == false)
                                    .Include(x => x.Product)
                                    .AsSplitQuery()
-                                   .OrderBy(x => Guid.NewGuid()) // Random order
+                                    // Random order
                                    .Select(x => new PostViewModelForFeaturedImage
                                    {
                                        PostId = x.Id,
@@ -343,7 +343,7 @@ namespace Infrastructure.Repository
                                    .ToListAsync();
             }
 
-            return await postsQuery.OrderBy(x => Guid.NewGuid()) // Random order
+            return await postsQuery // Random order
                                    .Select(x => new PostViewModelForFeaturedImage
                                    {
                                        PostId = x.Id,
