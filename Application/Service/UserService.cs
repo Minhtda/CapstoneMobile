@@ -76,16 +76,37 @@ namespace Application.Service
             (newAccount.FirstName, newAccount.LastName) = StringUtil.SplitName(registerModel.Fullname);
             newAccount.ProfileImage = _ImageUrl;
             await _unitOfWork.UserRepository.AddAsync(newAccount);
-            var changesSaved = await _unitOfWork.SaveChangeAsync();
-            if (changesSaved > 0)
+            await _unitOfWork.SaveChangeAsync();
+            var loginUser = await _unitOfWork.UserRepository.FindUserByEmail(registerModel.Email);
+            if (loginUser.VerifyUserId == null)
             {
-                var verifyUserId = await CreateVerifyUser(newAccount.Id);
-                newAccount.VerifyUserId = verifyUserId;
-
-                var walletId = await CreateWallet(newAccount.Id);
-                newAccount.WalletId = walletId;
-                _unitOfWork.UserRepository.Update(newAccount);
-                return await _unitOfWork.SaveChangeAsync() > 0;
+                var verifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserIdForRegister(loginUser.Id);
+                if (verifyUser == null)
+                {
+                    var verifyUserId = await CreateVerifyUser(loginUser.Id);
+                    loginUser.VerifyUserId = verifyUserId;
+                    _unitOfWork.UserRepository.Update(loginUser);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+            }
+            if (loginUser.WalletId == null)
+            {
+                var wallet = await _unitOfWork.WalletRepository.FindWalletByUserId(loginUser.Id);
+                if (wallet == null)
+                {
+                    var walletId = await CreateWallet(loginUser.Id);
+                    loginUser.WalletId = walletId;
+                    _unitOfWork.UserRepository.Update(loginUser);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+            }
+            loginUser = await _unitOfWork.UserRepository.FindUserByEmail(registerModel.Email);
+            if (loginUser.VerifyUserId !=null)
+            {
+                if (loginUser.WalletId != null)
+                {
+                    return true;
+                }
             }
             return false;
         }
