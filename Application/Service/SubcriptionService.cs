@@ -50,7 +50,7 @@ namespace Application.Service
                     {
                         return false;
                     }
-                    if (subscriptionHistory.EndDate < _currentTime.GetCurrentTime())
+                    if (subscriptionHistory.EndDate >= _currentTime.GetCurrentTime())
                     {
                         return false;
                     }
