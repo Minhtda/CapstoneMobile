@@ -238,17 +238,29 @@ namespace Application.Service
                     };
                     await _unitOfWork.UserRepository.AddAsync(newAcc);
                     var changesSaved = await _unitOfWork.SaveChangeAsync();
-                    if (changesSaved > 0)
+                    loginUser = await _unitOfWork.UserRepository.FindUserByEmail(email);
+                }
+                if (loginUser.VerifyUserId == null)
+                {
+                    var verifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserIdForRegister(loginUser.Id);
+                    if (verifyUser == null)
                     {
-                        var verifyUserId = await CreateVerifyUser(newAcc.Id);
-                        newAcc.VerifyUserId = verifyUserId;
-
-                        var walletId = await CreateWallet(newAcc.Id);
-                        newAcc.WalletId = walletId;
-                        _unitOfWork.UserRepository.Update(newAcc);
+                        var verifyUserId = await CreateVerifyUser(loginUser.Id);
+                        loginUser.VerifyUserId = verifyUserId;
+                        _unitOfWork.UserRepository.Update(loginUser);
                         await _unitOfWork.SaveChangeAsync();
                     }
-                    loginUser = await _unitOfWork.UserRepository.FindUserByEmail(email);
+                }
+                if (loginUser.WalletId == null)
+                {
+                    var wallet = await _unitOfWork.WalletRepository.FindWalletByUserId(loginUser.Id);
+                    if (wallet == null)
+                    {
+                        var walletId = await CreateWallet(loginUser.Id);
+                        loginUser.WalletId = walletId;
+                        _unitOfWork.UserRepository.Update(loginUser);
+                        await _unitOfWork.SaveChangeAsync();
+                    }
                 }
                 var accessToken = loginUser.GenerateTokenString(_appConfiguration!.JWTSecretKey, _currentTime.GetCurrentTime());
                 var refreshToken = RefreshToken.GetRefreshToken();
@@ -339,7 +351,7 @@ namespace Application.Service
             };
             await _unitOfWork.VerifyUsersRepository.AddAsync(newVerifyUser);
             await _unitOfWork.SaveChangeAsync();
-            var verifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserId(userId);
+            var verifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserIdForRegister(userId);
             if (verifyUser == null)
             {
                 Console.WriteLine("VerifyUser is null after SaveChangeAsync.");

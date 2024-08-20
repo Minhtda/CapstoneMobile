@@ -22,17 +22,20 @@ namespace Infrastructure.Repository
 
         public async Task<VerifyUser> FindVerifyUserIdByUserId(Guid userId)
         {
-            return await _appDbContext.VerifyUsers.Where(x => x.UserId == userId&&x.IsDelete==false && x.UserImage != null).Include(m => m.VerificationStatus ).SingleAsync();
+            return await _appDbContext.VerifyUsers.Where(x => x.UserId == userId&&x.IsDelete==false ).Include(m => m.VerificationStatus ).SingleAsync();
         }
-
+        public async Task<VerifyUser> FindVerifyUserIdByUserIdForRegister(Guid userId)
+        {
+            return await _appDbContext.VerifyUsers.Where(x => x.UserId == userId && x.IsDelete == false).FirstOrDefaultAsync();
+        }
         public async Task<VerifyUser> FindVerifyUserIdByUserIdForUploadImage(Guid userId)
         {
-            return await _appDbContext.VerifyUsers.Where(x => x.UserId == userId && x.IsDelete == false && x.VerifyStatusId != 2 && x.UserImage != null).Include(m => m.VerificationStatus).SingleAsync();
+            return await _appDbContext.VerifyUsers.Where(x => x.UserId == userId && x.IsDelete == false && x.VerifyStatusId != 2 ).Include(m => m.VerificationStatus).SingleAsync();
         }
 
         public async Task<List<VerifyViewModel>> GetAllVerifyUserAsync()
         {
-            var listVerifyUser=await _appDbContext.VerifyUsers.Where(x=>x.IsDelete==false && x.UserImage != null)
+            var listVerifyUser=await _appDbContext.VerifyUsers.Where(x=>x.IsDelete==false )
                                                               .Include(x=>x.User).ThenInclude(u=>u.Role).AsSplitQuery()
                                                               .Include(x=>x.VerificationStatus).AsSplitQuery()
                                                               .Select(x=>new VerifyViewModel
@@ -49,12 +52,12 @@ namespace Infrastructure.Repository
 
         public async Task<VerifyUser> GetVerificationDeniedByUserId(Guid userId)
         {
-            return await _appDbContext.VerifyUsers.Where(x => x.UserId == userId && x.IsDelete == false&&x.VerifyStatusId==3 && x.UserImage != null).Include(m => m.VerificationStatus).SingleAsync();
+            return await _appDbContext.VerifyUsers.Where(x => x.UserId == userId && x.IsDelete == false&&x.VerifyStatusId==3 ).Include(m => m.VerificationStatus).SingleAsync();
         }
 
         public async Task<VerifyViewModel> GetVerifyUserDetailAsync(Guid id)
         {
-            var verfiyModel=await _appDbContext.VerifyUsers.Where(x=>x.IsDelete==false&&x.Id==id && x.UserImage != null)
+            var verfiyModel=await _appDbContext.VerifyUsers.Where(x=>x.IsDelete==false&&x.Id==id )
                                                             .Include(x => x.User).ThenInclude(u => u.Role).AsSplitQuery()
                                                               .Include(x => x.VerificationStatus).AsSplitQuery()
                                                               .Select(x => new VerifyViewModel
@@ -72,7 +75,7 @@ namespace Infrastructure.Repository
 
         public async Task<VerifyViewModel> GetVerifyUserDetailByUserIdAsync(Guid userId)
         {
-            var verfiyModel = await _appDbContext.VerifyUsers.Where(x => x.IsDelete == false && x.UserId == userId && x.UserImage != null)
+            var verfiyModel = await _appDbContext.VerifyUsers.Where(x => x.IsDelete == false && x.UserId == userId )
                                                          .Include(x => x.User).ThenInclude(u => u.Role).AsSplitQuery()
                                                            .Include(x => x.VerificationStatus).AsSplitQuery()
                                                            .Select(x => new VerifyViewModel
