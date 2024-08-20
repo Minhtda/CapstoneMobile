@@ -16,11 +16,13 @@ namespace Application.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IClaimService _claimService;
-        public SubcriptionService(IUnitOfWork unitOfWork,IMapper mapper, IClaimService claimService)
+        private readonly ICurrentTime _currentTime;
+        public SubcriptionService(IUnitOfWork unitOfWork,IMapper mapper, IClaimService claimService, ICurrentTime currentTime)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _claimService = claimService;
+            _currentTime = currentTime;
         }
 
         public async Task<bool> CreateSubcription(CreateSubcriptionModel createSubcriptionModel)
@@ -48,7 +50,7 @@ namespace Application.Service
                     {
                         return false;
                     }
-                    if (subscriptionHistory.EndDate < DateTime.UtcNow)
+                    if (subscriptionHistory.EndDate < _currentTime.GetCurrentTime())
                     {
                         return false;
                     }
