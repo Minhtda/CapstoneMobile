@@ -89,7 +89,7 @@ namespace Application.Service
                     await _unitOfWork.SaveChangeAsync();
                 }
             }
-            if (loginUser.WalletId == null)
+            if (loginUser.WalletId == new Guid())
             {
                 var wallet = await _unitOfWork.WalletRepository.FindWalletByUserId(loginUser.Id);
                 if (wallet == null)
@@ -272,7 +272,7 @@ namespace Application.Service
                         await _unitOfWork.SaveChangeAsync();
                     }
                 }
-                if (loginUser.WalletId == null)
+                if (loginUser.WalletId == new Guid())
                 {
                     var wallet = await _unitOfWork.WalletRepository.FindWalletByUserId(loginUser.Id);
                     if (wallet == null)
