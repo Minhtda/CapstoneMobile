@@ -37,15 +37,21 @@ namespace Application.Service
         public async Task<bool> ExtendSubscription()
         {
             var isExtended = false;
+            Wallet wallet = new Wallet();
            var listUser=await _unitOfWork.UserRepository.GetAllMember();
             foreach(var user in listUser)
             {
-               var wallet=await _unitOfWork.WalletRepository.GetUserWalletByUserId(user.Id);
-                if(wallet == null) 
+                
+                try
+                {
+                   wallet = await _unitOfWork.WalletRepository.GetUserWalletByUserId(user.Id);
+                } catch(Exception ex)
                 {
                     isExtended = false;
                     continue;
                 }
+              
+               
                 var subscriptionHistoriesViewModel=await _unitOfWork.SubscriptionHistoryRepository.GetCurrentUserAvailableSubscripion(user.Id);
                 foreach(var subscriptionHistoryViewModel in subscriptionHistoriesViewModel)
                 {
