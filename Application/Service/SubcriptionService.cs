@@ -40,18 +40,27 @@ namespace Application.Service
             Wallet wallet = new Wallet();
            var listUser=await _unitOfWork.UserRepository.GetAllMember();
             foreach(var user in listUser)
-            {
-                
+            { 
                 try
                 {
                    wallet = await _unitOfWork.WalletRepository.GetUserWalletByUserId(user.Id);
                 } catch(Exception ex)
                 {
+                    Wallet newWallet = new Wallet()
+                    {
+                        OwnerId = user.Id,
+                        UserBalance = 0,
+                    };
+                    await _unitOfWork.WalletRepository.AddAsync(newWallet);
+                    await _unitOfWork.SaveChangeAsync();
+                    var userWallet = await _unitOfWork.WalletRepository.FindWalletByUserId(user.Id);
+                    var walletId = userWallet.Id;
+                    user.WalletId = walletId;
+                    _unitOfWork.UserRepository.Update(user);
+                    await _unitOfWork.SaveChangeAsync();
                     isExtended = false;
                     continue;
                 }
-              
-               
                 var subscriptionHistoriesViewModel=await _unitOfWork.SubscriptionHistoryRepository.GetCurrentUserAvailableSubscripion(user.Id);
                 foreach(var subscriptionHistoryViewModel in subscriptionHistoriesViewModel)
                 {
@@ -87,6 +96,7 @@ namespace Application.Service
                                 Amount=subscription.Price
                             };
                             subscriptionHistory.Status = true;
+                            subscriptionHistory.EndDate = _currentTime.GetCurrentTime().AddDays(subscription.ExpiryDay);
                             _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
                             _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
                             _unitOfWork.WalletRepository.Update(wallet);
