@@ -40,8 +40,12 @@ namespace Application.Service
            var listUser=await _unitOfWork.UserRepository.GetAllMember();
             foreach(var user in listUser)
             {
-                var userWallet=await _unitOfWork.WalletRepository.GetWalletByUserId(user.Id);
-                var wallet=await _unitOfWork.WalletRepository.GetByIdAsync(userWallet.Id);
+               var wallet=await _unitOfWork.WalletRepository.GetUserWalletByUserId(user.Id);
+                if(wallet == null) 
+                {
+                    isExtended = false;
+                    continue;
+                }
                 var subscriptionHistoriesViewModel=await _unitOfWork.SubscriptionHistoryRepository.GetCurrentUserAvailableSubscripion(user.Id);
                 foreach(var subscriptionHistoryViewModel in subscriptionHistoriesViewModel)
                 {
