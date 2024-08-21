@@ -36,6 +36,7 @@ namespace Application.Service
 
         public async Task<bool> ExtendSubscription()
         {
+            var isExtended = false;
            var listUser=await _unitOfWork.UserRepository.GetAllMember();
             foreach(var user in listUser)
             {
@@ -48,11 +49,11 @@ namespace Application.Service
                     var subscriptionHistory = await _unitOfWork.SubscriptionHistoryRepository.GetByIdAsync(subscriptionHistoryViewModel.Id);
                     if (subscriptionHistory.IsExtend == false)
                     {
-                        return false;
+                        isExtended= false;
                     }
                     if (subscriptionHistory.EndDate >= _currentTime.GetCurrentTime())
                     {
-                        return false;
+                        isExtended= false;
                     }
                     else
                     {
@@ -79,11 +80,12 @@ namespace Application.Service
                             _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
                             _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
                             _unitOfWork.WalletRepository.Update(wallet);
+                            isExtended = await _unitOfWork.SaveChangeAsync() > 0;
                         }
                     }
                 }
             }
-            return await _unitOfWork.SaveChangeAsync()>0;
+            return isExtended;
         }
 
         public async Task<List<Subscription>> GetAllSubscriptionAsync()

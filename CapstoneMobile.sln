@@ -3,13 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MobileAPI", "MobileAPI\MobileAPI.csproj", "{825AC2BA-5238-431C-9B6D-514256C51961}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MobileAPI", "MobileAPI\MobileAPI.csproj", "{825AC2BA-5238-431C-9B6D-514256C51961}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{44CA0F0B-8A74-4A75-8CB0-C9B24C36168D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{44CA0F0B-8A74-4A75-8CB0-C9B24C36168D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{FF0F7C98-F3B7-4EAB-AA45-D838A3C06162}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{FF0F7C98-F3B7-4EAB-AA45-D838A3C06162}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{B6042E65-E383-497F-8346-589A201B246F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{B6042E65-E383-497F-8346-589A201B246F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Domain.Test", "Backend.Domain.Test\Backend.Domain.Test.csproj", "{0B8D3B5B-72FD-46F5-827C-5AD2D982F9E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Application.Test", "Backend.Application.Test\Backend.Application.Test.csproj", "{EADFA2F1-8FB5-43C9-A8B0-4A2CA8390FE6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Infrastructure.Test", "Backend.Infrastructure.Test\Backend.Infrastructure.Test.csproj", "{F9E0447C-D330-4F02-96BD-E1ECDCA248A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +39,18 @@ Global
 		{B6042E65-E383-497F-8346-589A201B246F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6042E65-E383-497F-8346-589A201B246F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6042E65-E383-497F-8346-589A201B246F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B8D3B5B-72FD-46F5-827C-5AD2D982F9E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B8D3B5B-72FD-46F5-827C-5AD2D982F9E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B8D3B5B-72FD-46F5-827C-5AD2D982F9E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B8D3B5B-72FD-46F5-827C-5AD2D982F9E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EADFA2F1-8FB5-43C9-A8B0-4A2CA8390FE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EADFA2F1-8FB5-43C9-A8B0-4A2CA8390FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EADFA2F1-8FB5-43C9-A8B0-4A2CA8390FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EADFA2F1-8FB5-43C9-A8B0-4A2CA8390FE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9E0447C-D330-4F02-96BD-E1ECDCA248A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9E0447C-D330-4F02-96BD-E1ECDCA248A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9E0447C-D330-4F02-96BD-E1ECDCA248A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9E0447C-D330-4F02-96BD-E1ECDCA248A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
