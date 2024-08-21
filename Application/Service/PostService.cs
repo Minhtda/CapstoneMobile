@@ -152,7 +152,11 @@ namespace Application.Service
                     {
                         amount = policy.FirstOrDefault().PostPrice;
                     }
-                    if (userWallet.UserBalance < amount)
+                    var wallletTransaction = await _unitOfWork.WalletTransactionRepository.GetAllTransactionByUserId(_claimService.GetCurrentUserId);
+                    float pendingTransaction = wallletTransaction?.Where(item => item.Action == "Purchase pending").Sum(item => item.Amount) ?? 0;
+                    float cancleTransaction = wallletTransaction?.Where(item => item.Action == "Cancelled Pending").Sum(item => item.Amount) ?? 0;
+                    float deniedTransaction = wallletTransaction?.Where(item => item.Action == "Purchase denied").Sum(item => item.Amount) ?? 0;
+                    if (userWallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction < amount)
                     {
                         throw new Exception("Your user balance is not enough to purchase this post");
                     }
