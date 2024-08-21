@@ -164,7 +164,7 @@ namespace Application.Service
                     var imageUrl = await _uploadFile.UploadFileToFireBase(postModel.productModel.ProductImage, "Product");
                     var newProduct = _mapper.Map<Product>(postModel.productModel);
                     newProduct.ProductImageUrl = imageUrl;
-                    if (postModel.productModel.ConditionId == 2 || postModel.productModel.ProductPrice == null)
+                    if (postModel.productModel.ConditionId == 2 || postModel.productModel.ProductPrice == null||postModel.productModel.ConditionId==3)
                     {
                         newProduct.ProductPrice = 0;
                     }
