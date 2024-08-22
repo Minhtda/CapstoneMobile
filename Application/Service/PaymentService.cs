@@ -47,8 +47,10 @@ namespace Application.Service
             }
             var wallletTransaction = await _unitOfWork.WalletTransactionRepository.GetAllTransactionByUserId(_claimsService.GetCurrentUserId);
             float pendingTransaction = wallletTransaction?.Where(item => item.Action == "Purchase pending").Sum(item => item.Amount) ?? 0;
-            if (userWallet.UserBalance - pendingTransaction < (float)subscription.Price)
-            {
+            float cancleTransaction = wallletTransaction?.Where(item => item.Action == "Cancelled Pending").Sum(item => item.Amount) ?? 0;
+            float deniedTransaction = wallletTransaction?.Where(item => item.Action == "Purchase denied").Sum(item => item.Amount) ?? 0;
+            if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction < (float)subscription.Price)
+            { 
                 throw new Exception("User balance not enough to purchase");
             }
             wallet.UserBalance=userWallet.UserBalance-subscription.Price;
