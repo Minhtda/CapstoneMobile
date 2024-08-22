@@ -443,6 +443,10 @@ namespace Application.Service
             {
                 throw new Exception("You cannot unban this user");
             }
+            if (user.IsDelete == false)
+            {
+                throw new Exception("This user is not banned");
+            }
             user.IsDelete= false;
             _unitOfWork.UserRepository.Update(user);
             return await _unitOfWork.SaveChangeAsync() > 0;
