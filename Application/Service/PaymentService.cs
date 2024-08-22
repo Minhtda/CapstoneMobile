@@ -47,7 +47,7 @@ namespace Application.Service
             }
             var wallletTransaction = await _unitOfWork.WalletTransactionRepository.GetAllTransactionByUserId(_claimsService.GetCurrentUserId);
             float pendingTransaction = wallletTransaction?.Where(item => item.Action == "Purchase pending").Sum(item => item.Amount) ?? 0;
-            if (userWallet.UserBalance - pendingTransaction < subscription.Price)
+            if (userWallet.UserBalance - pendingTransaction < (float)subscription.Price)
             {
                 throw new Exception("User balance not enough to purchase");
             }

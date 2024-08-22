@@ -84,7 +84,7 @@ namespace Application.Service
                         {
                             WalletTransaction walletTransaction = new WalletTransaction()
                             {
-                                TransactionType="Extend subscription failed,user balance not enough",
+                                TransactionType="Extend subscription failed,user balance is not enough",
                                 WalletId=wallet.Id
                             };
                              subscriptionHistory.Status = false;
@@ -95,12 +95,12 @@ namespace Application.Service
                             wallet.UserBalance=wallet.UserBalance-subscription.Price;
                             WalletTransaction walletTransaction = new WalletTransaction()
                             {
-                                TransactionType = "Extend subscription succees",
+                                TransactionType = "Extend subscription successfully",
                                 WalletId=wallet.Id,
                                 Amount=subscription.Price
                             };
                             subscriptionHistory.Status = true;
-                            subscriptionHistory.EndDate = _currentTime.GetCurrentTime().AddDays(subscription.ExpiryDay);
+                            subscriptionHistory.EndDate=subscriptionHistory.EndDate.AddDays(subscription.ExpiryDay);
                             _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
                             _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
                             _unitOfWork.WalletRepository.Update(wallet);

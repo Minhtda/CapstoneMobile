@@ -95,8 +95,10 @@ namespace Infrastructure.MapperConfig
         internal void SubcriptionMap()
         {
             CreateMap<CreateSubcriptionModel, Subscription>()
+                .ForMember(dest => dest.ExpiryDay, opt => opt.MapFrom(x => x.ExpiryDay))
                 .ReverseMap();
             CreateMap<UpdateSubscriptionModel, Subscription>()
+                .ForMember(dest=>dest.ExpiryDay,opt=>opt.MapFrom(x=>x.ExpiryDay))
                 .ReverseMap();
             CreateMap<SubscriptionDetailViewModel, Subscription>()
                 .ReverseMap();

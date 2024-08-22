@@ -180,7 +180,7 @@ namespace Application.Service
                     };
                     var walletTransaction = new WalletTransaction()
                     {
-                        TransactionType = "Buy post",
+                        TransactionType = "Upload post by wallet",
                         Amount = amount,
                         WalletId = userWallet.Id
                     };
@@ -197,7 +197,7 @@ namespace Application.Service
                 var imageUrl = await _uploadFile.UploadFileToFireBase(postModel.productModel.ProductImage, "Product");
                 var newProduct = _mapper.Map<Product>(postModel.productModel);
                 newProduct.ProductImageUrl = imageUrl;
-                if (postModel.productModel.ConditionId == 2 || postModel.productModel.ProductPrice == null)
+                if (postModel.productModel.ConditionId == 2 || postModel.productModel.ProductPrice == null||postModel.productModel.ConditionId==3)
                 {
                     newProduct.ProductPrice = 0;
                 }

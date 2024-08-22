@@ -122,11 +122,15 @@ namespace Application.Service
             {
                 throw new Exception("Password is not correct");
             }
+            if (user.IsDelete == true)
+            {
+                throw new Exception("You have been banned");
+            }
             var findKey = user.Id.ToString() + "_" + apiOrigin;
             var accessToken = user.GenerateTokenString(_appConfiguration!.JWTSecretKey, _currentTime.GetCurrentTime());
             var refreshToken = RefreshToken.GetRefreshToken();
-            var key = user.Id.ToString() + "_" + apiOrigin;
-            var accessTokenKey = user.Id.ToString() + "_" + "accesstoken";
+            /*var key = user.Id.ToString() + "_" + apiOrigin;*/
+            /*var accessTokenKey = user.Id.ToString() + "_" + "accesstoken";*/
          /*   var cacheData = _cacheService.SetData<string>(key, refreshToken, _currentTime.GetCurrentTime().AddDays(2));
             var accessTokeData = _cacheService.SetData<string>(accessTokenKey, accessToken, _currentTime.GetCurrentTime().AddDays(2));*/
           /*  Wallet findUserWallet = null;
@@ -240,6 +244,10 @@ namespace Application.Service
                 string lastName = payload.FamilyName;
                 string pictureUrl = _ImageUrl;
                 var loginUser = await _unitOfWork.UserRepository.FindUserByEmail(email);
+                if (loginUser.IsDelete == true)
+                {
+                    throw new Exception("You have been banned");
+                }
                 if (loginUser == null)
                 {
                     var newAcc = new User()
@@ -283,6 +291,7 @@ namespace Application.Service
                         await _unitOfWork.SaveChangeAsync();
                     }
                 }
+                
                 var accessToken = loginUser.GenerateTokenString(_appConfiguration!.JWTSecretKey, _currentTime.GetCurrentTime());
                 var refreshToken = RefreshToken.GetRefreshToken();
                /* var key = loginUser.Id.ToString() + "_" + apiOrigin;*/

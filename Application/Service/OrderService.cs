@@ -183,7 +183,7 @@ namespace Application.Service
                     var walletTransactionPostOwner = new WalletTransaction
                     {
                         Amount = post.ProductPrice,
-                        TransactionType = "Product Sale",
+                        TransactionType = "Product Sold",
                         WalletId = walletPost.Id
                     };
                     await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransactionPostOwner);
@@ -242,7 +242,7 @@ namespace Application.Service
                                 Amount = walletTransaction.Amount,
                                 OrderId = orderId,
                                 WalletId = walletTransaction.WalletId,
-                                TransactionType = "Purchase cancle"
+                                TransactionType = "Purchase cancelled"
                             };
                             await _unitOfWork.WalletTransactionRepository.AddAsync(newWalletTransaction);
                             if (orderStatus == _confirm )
