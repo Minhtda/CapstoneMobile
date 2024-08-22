@@ -9,7 +9,7 @@ namespace Application.ViewModel.SubcriptionModel
 {
     public class CreateSubcriptionModel
     {
-        [Range(1, long.MaxValue, ErrorMessage = "Price must be greater than 0.")]
+        [Range(1, long.MaxValue, ErrorMessage = "Price must be greater than 1.")]
         public long Price { get; set; }
         public string SubcriptionType { get; set; }
         public int ExpiryDay { get; set; }
