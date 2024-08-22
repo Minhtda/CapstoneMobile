@@ -36,7 +36,7 @@ namespace Backend.Application.Test.ServiceTest
             //Arrange
             var listUser = new List<User>();
             var registerModel = _fixture.Build<RegisterModel>().With(x => x.Phonenumber, new Xeger("^(?!0+$)(\\+\\d{1,3}[- ]?)?(?!0+$)\\d{10,15}$").Generate).With(x => x.Birthday, "2002-09-12").Create();
-            var newUser = new User { Id = Guid.NewGuid(), Email = registerModel.Email };
+            var newUser = new User { Id = Guid.NewGuid(), Email = registerModel.Email,VerifyUserId=null,WalletId=null};
             var newVerifyUser = new VerifyUser { Id = Guid.NewGuid(), UserId = newUser.Id ,VerifyStatusId=1};
             var newWallet = new Wallet { Id = Guid.NewGuid(), OwnerId = newUser.Id };
             //Act
@@ -112,7 +112,7 @@ namespace Backend.Application.Test.ServiceTest
             //Arrange 
             var code = StringUtil.RandomString(6);
             var email = _fixture.Create<MailAddress>();
-            object outputEmail = email;
+            object outputEmail = email.ToString();
             //Act
             //   _unitOfWorkMock.Setup(unit => unit.CacheRepository.GetData<string>(code)).Returns(email.Address);
             _memoryCacheMock.Setup(cache => cache.TryGetValue(It.IsAny<string>(),out outputEmail)).Returns(true);
@@ -126,10 +126,10 @@ namespace Backend.Application.Test.ServiceTest
             //Arrange 
             var code = StringUtil.RandomString(6);
             var email = _fixture.Create<MailAddress>();
-            object outputEmail = email;
+            object outputEmail = null;
             //Act
             // _unitOfWorkMock.Setup(unit => unit.CacheRepository.GetData<string>(code)).Returns((string)null);
-            _memoryCacheMock.Setup(cache => cache.TryGetValue(It.IsAny<string>(), out outputEmail)).Returns(false);
+            _memoryCacheMock.Setup(cache => cache.TryGetValue(It.IsAny<string>(), out outputEmail)).Returns(true);
             bool isCorrectCode = _userService.CheckVerifyCode(code);
             //Assert
             Assert.False(isCorrectCode);
