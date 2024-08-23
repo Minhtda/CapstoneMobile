@@ -49,7 +49,7 @@ namespace Application.Util
             }
         }
 
-        public async Task<bool> SendMailAsync(List<string> emails, string subject, string message)
+        public async Task<bool> SendListMailAsync(List<string> emails, string subject, string message)
         {
             try
             {
@@ -87,6 +87,6 @@ namespace Application.Util
     public interface ISendMailHelper
     {
         public Task<bool> SendMailAsync(string email, string subject, string message);
-        public Task<bool> SendMailAsync(List<string> emails, string subject, string message);
+        public Task<bool> SendListMailAsync(List<string> emails, string subject, string message);
     }
 }
