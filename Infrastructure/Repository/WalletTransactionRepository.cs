@@ -33,7 +33,7 @@ namespace Infrastructure.Repository
                                                                            Amount = x.Amount,
                                                                            CreationDate = DateOnly.FromDateTime(x.CreationDate.Value),
                                                                            CreationTime = TimeOnly.FromDateTime(x.CreationDate.Value)
-                                                                       }).ToListAsync();
+                                                                       }).OrderByDescending(x => x.CreationDate).ToListAsync();
             return listTransaction;
 
         }
@@ -53,7 +53,7 @@ namespace Infrastructure.Repository
                                                                            CreationDate = DateOnly.FromDateTime(x.CreationDate.Value),
                                                                            CreationTime = TimeOnly.FromDateTime(x.CreationDate.Value),
                                                                            PostAmount=postAmount
-                                                                       }).ToListAsync();
+                                                                       }).OrderByDescending(x => x.CreationDate).ToListAsync();
             return listTransaction;
         }
 
