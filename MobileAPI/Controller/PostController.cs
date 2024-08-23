@@ -227,7 +227,17 @@ namespace MobileAPI.Controllers
             }
             return Ok(listPost);
         }
-
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetMatchingPost(string title)
+        {
+            var posts = await _postService.GetMatchingPost(title);
+            /*     if(posts.Items.Count() == 0)
+                 {
+                     return NotFound();
+                 }*/
+            return Ok(posts);
+        }
         /*  [HttpDelete]
           public async Task<IActionResult> RemovePostExpiredSubscription()
           {

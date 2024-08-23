@@ -32,5 +32,6 @@ namespace Application.InterfaceService
         Task<List<PostViewModel>> SearchPostCreatedByCurrentUserByPostTitle(string postTitle);
         Task<bool> RemovePostWhenSubscriptionExpire();
         Task<List<PostViewModelForFeaturedImage>> GetFeaturedImage();
+        Task<List<PostViewModel>> GetMatchingPost(string title);
     }
 }
