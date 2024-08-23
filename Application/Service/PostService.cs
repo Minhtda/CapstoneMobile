@@ -432,5 +432,18 @@ namespace Application.Service
             var post = await _unitOfWork.PostRepository.GetFeaturedImagePost();
             return post;
         }
+
+        public async Task<List<PostViewModel>> GetMatchingPost(string title)
+        {
+            var allPosts = await _unitOfWork.PostRepository.GetAllPost(_claimService.GetCurrentUserId);
+
+            var filteredPosts = allPosts.AsEnumerable().Where(x => ContainInOrder.ContainsInOrder(x.PostTitle.ToLower(), title.ToLower()) && x.Product.ConditionId == 2);
+            if (filteredPosts.ToList().Count() == 0)
+            {
+                filteredPosts = allPosts.AsEnumerable().Where(x => x.Product.ConditionId == 3).OrderBy(x => Guid.NewGuid()) 
+                            .Take(6);
+            }
+            return filteredPosts.ToList();
+        }
     }
 }
