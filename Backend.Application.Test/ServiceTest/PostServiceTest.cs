@@ -147,11 +147,13 @@ namespace Backend.Application.Test.ServiceTest
                                                .With(x => x.OwnerId, Guid.Parse("981b9606-4f84-41b4-8a46-7b578bc1823d")).Create();
             var postModel = _fixture.Build<CreatePostModel>().With(x => x.PaymentType, "Wallet").With(x => x.productModel, productModel).Create();
             var post = _mapper.Map<Post>(postModel);
+            var transaction = _fixture.Build<WalletTransaction>().With(x=>x.WalletId,wallet.Id).Create();
             _claimServiceMock.Setup(claim => claim.GetCurrentUserId).Returns(Guid.Parse("981b9606-4f84-41b4-8a46-7b578bc1823d"));
             _unitOfWorkMock.Setup(unit => unit.PostRepository.AddAsync(post)).Verifiable();
             _unitOfWorkMock.Setup(unit => unit.ProductRepository.AddAsync(product)).Verifiable();
             _unitOfWorkMock.Setup(unit => unit.SaveChangeAsync()).ReturnsAsync(1);
             _unitOfWorkMock.Setup(unit => unit.WalletRepository.GetUserWalletByUserId(It.IsAny<Guid>())).ReturnsAsync(wallet);
+            _unitOfWorkMock.Setup(unit => unit.WalletTransactionRepository.AddAsync(transaction)).Verifiable();
             _unitOfWorkMock.Setup(unit => unit.VerifyUsersRepository.GetVerifyUserDetailByUserIdAsync(It.IsAny<Guid>())).ReturnsAsync(verifyModel);
             _uploadFileMock.Setup(upload => upload.UploadFileToFireBase(It.IsAny<IFormFile>(), It.IsAny<string>())).ReturnsAsync("Testlink");
             _unitOfWorkMock.Setup(repo => repo.PolicyRepository.GetAllAsync())
