@@ -41,7 +41,7 @@ namespace Infrastructure.Repository
         public async Task<List<TransactionViewModel>> GetAllTransactionByUserId(Guid userId)
         {
             int postAmount = _appDbContext.Posts.Where(x => x.UserId == userId && x.IsDelete == false).ToList().Count();
-            var listTransaction = await _appDbContext.WalletTransactions.Where(x => x.IsDelete == false&&x.Wallet.Owner.Id==userId)
+            var listTransaction = await _appDbContext.WalletTransactions.Where(x => x.IsDelete == false&&x.Wallet.Owner.Id==userId).OrderByDescending(x => x.CreationDate)
                                                                        .Include(x => x.Wallet).ThenInclude(wallet => wallet.Owner).AsSplitQuery()
                                                                        .Select(x => new TransactionViewModel
                                                                        {
@@ -53,7 +53,7 @@ namespace Infrastructure.Repository
                                                                            CreationDate = DateOnly.FromDateTime(x.CreationDate.Value),
                                                                            CreationTime = TimeOnly.FromDateTime(x.CreationDate.Value),
                                                                            PostAmount=postAmount
-                                                                       }).OrderByDescending(x => x.CreationDate).ToListAsync();
+                                                                       }).ToListAsync();
             return listTransaction;
         }
 
