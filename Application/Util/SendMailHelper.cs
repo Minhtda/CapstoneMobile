@@ -44,10 +44,12 @@ namespace Application.Util
             }
             catch (Exception ex)
             {
+                // Log the exception details for troubleshooting
+                Console.WriteLine($"Error sending email: {ex.Message}");
                 return false;
-                throw ex;
             }
         }
+
 
         public async Task<bool> SendListMailAsync(List<string> emails, string subject, string message)
         {
