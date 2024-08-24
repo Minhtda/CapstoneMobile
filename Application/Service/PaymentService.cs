@@ -14,6 +14,7 @@ using Application.VnPay.Config;
 using Application.VnPay.Request;
 using Application.VnPay.Response;
 using Hangfire;
+using Microsoft.Extensions.Caching.Memory;
 namespace Application.Service
 {
     public class PaymentService : IPaymentService
@@ -24,27 +25,30 @@ namespace Application.Service
         private readonly ICurrentUserIp _currentUserIp;
         private readonly ICurrentTime _currentTime;
         private readonly IPostService _postService;
+        private readonly IMemoryCache _memoryCache;
         public PaymentService(IOptions<VnPayConfig> vnpayConfig
-            , IClaimService claimsService,IUnitOfWork unitOfWork,ICurrentUserIp currentUserIp,ICurrentTime currentTime, IPostService postService)
+            , IClaimService claimsService, IUnitOfWork unitOfWork, ICurrentUserIp currentUserIp, ICurrentTime currentTime,
+            IPostService postService, IMemoryCache memoryCache)
         {
-            this.vnPayConfig = vnpayConfig. Value;
+            this.vnPayConfig = vnpayConfig.Value;
             _claimsService = claimsService;
             _unitOfWork = unitOfWork;
             _currentUserIp = currentUserIp;
             _currentTime = currentTime;
             _postService = postService;
+            _memoryCache = memoryCache;
         }
 
         public async Task<bool> BuySubscription(Guid subscriptionId)
         {
-            var subscription=await _unitOfWork.SubcriptionRepository.GetByIdAsync(subscriptionId);
-            if(subscription == null)
+            var subscription = await _unitOfWork.SubcriptionRepository.GetByIdAsync(subscriptionId);
+            if (subscription == null)
             {
                 throw new Exception("Cannot find subscription");
             }
             var userWallet = await _unitOfWork.WalletRepository.GetWalletByUserId(_claimsService.GetCurrentUserId);
             var wallet = await _unitOfWork.WalletRepository.GetByIdAsync(userWallet.Id);
-            if(userWallet == null)
+            if (userWallet == null)
             {
                 throw new Exception("Cannot find wallet");
             }
@@ -53,33 +57,33 @@ namespace Application.Service
             float cancleTransaction = wallletTransaction?.Where(item => item.Action == "Cancelled Pending").Sum(item => item.Amount) ?? 0;
             float deniedTransaction = wallletTransaction?.Where(item => item.Action == "Purchase denied").Sum(item => item.Amount) ?? 0;
             if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction < (float)subscription.Price)
-            { 
+            {
                 throw new Exception("User balance not enough to purchase");
             }
-            wallet.UserBalance=userWallet.UserBalance-subscription.Price;
+            wallet.UserBalance = userWallet.UserBalance - subscription.Price;
             _unitOfWork.WalletRepository.Update(wallet);
             WalletTransaction walletTransaction = new WalletTransaction()
             {
-                WalletId=wallet.Id,
-                CreatedBy=userWallet.Id,
-                SubscriptionId=subscriptionId,
-                TransactionType=$"Purchase subscription {subscription.Description}",
-                Amount=(float)subscription.Price,
+                WalletId = wallet.Id,
+                CreatedBy = userWallet.Id,
+                SubscriptionId = subscriptionId,
+                TransactionType = $"Purchase subscription {subscription.Description}",
+                Amount = (float)subscription.Price,
             };
             SubscriptionHistory subcriptionHistory = new SubscriptionHistory()
             {
-                SubcriptionId=subscriptionId,
-                UserId=_claimsService.GetCurrentUserId,
-                StartDate=_currentTime.GetCurrentTime(),
-                EndDate=_currentTime.GetCurrentTime().AddDays(subscription.ExpiryDay),
-                Status=true,
-                IsExtend=true
+                SubcriptionId = subscriptionId,
+                UserId = _claimsService.GetCurrentUserId,
+                StartDate = _currentTime.GetCurrentTime(),
+                EndDate = _currentTime.GetCurrentTime().AddDays(subscription.ExpiryDay),
+                Status = true,
+                IsExtend = true
             };
             _unitOfWork.WalletRepository.Update(wallet);
             await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
             await _unitOfWork.SubscriptionHistoryRepository.AddAsync(subcriptionHistory);
             BackgroundJob.Schedule(() => (ExtendSubscriptionByUserId(_claimsService.GetCurrentUserId)), TimeSpan.FromDays(subscription.ExpiryDay));
-            return await _unitOfWork.SaveChangeAsync()>0;
+            return await _unitOfWork.SaveChangeAsync() > 0;
         }
         public async Task<bool> ExtendSubscriptionByUserId(Guid userId)
         {
@@ -142,80 +146,80 @@ namespace Application.Service
             switch (choice)
             {
                 case 1:
-                 string paymentUrl = "";
-            decimal amount = 50000;
-            string key = _claimsService.GetCurrentUserId.ToString() + "_" + "Payment";
-            /*string keyForCount = _claimsService.GetCurrentUserId.ToString() + "_" + "Count";
-            int count = _cacheService.GetData<int>(keyForCount);
-            if (count != null)
-            {
-                count++;
-            }*/
-            string orderId = key;
-            var vnpayRequest = new VnPayRequest(vnPayConfig.Version,
-                vnPayConfig.TmnCode, DateTime.UtcNow,
-                _currentUserIp.UserIp, amount, "VND", "other", "Nap tien vao vi", vnPayConfig.ReturnUrl, orderId);
-            paymentUrl = vnpayRequest.GetLink(vnPayConfig.PaymentUrl, vnPayConfig.HashSecret);
-            if (paymentUrl != null)
-            {
-                /*_cacheService.SetData<int>(keyForCount, count, DateTimeOffset.UtcNow.AddHours(24));*/
-            }
-                  
-            return paymentUrl;
-                case 2:
-                     paymentUrl = "";
-                    amount = 100000;
-                    key = _claimsService.GetCurrentUserId.ToString() + "_" + "Payment";
-                    /*keyForCount = _claimsService.GetCurrentUserId.ToString() + "_" + "Count";
-                    count = _cacheService.GetData<int>(keyForCount);
+                    string paymentUrl = "";
+                    decimal amount = 50000;
+                    string key = _claimsService.GetCurrentUserId.ToString() + "_" + "Payment";
+                    string keyForCount = _claimsService.GetCurrentUserId.ToString() + "_" + "Count";
+                    int count = _memoryCache.Get<int>(keyForCount);
                     if (count != null)
                     {
                         count++;
-                    }*/
-                    orderId = key;
-                     vnpayRequest = new VnPayRequest(vnPayConfig.Version,
+                    }
+                    string orderId = key + "_" + count;
+                    var vnpayRequest = new VnPayRequest(vnPayConfig.Version,
                         vnPayConfig.TmnCode, DateTime.UtcNow,
                         _currentUserIp.UserIp, amount, "VND", "other", "Nap tien vao vi", vnPayConfig.ReturnUrl, orderId);
                     paymentUrl = vnpayRequest.GetLink(vnPayConfig.PaymentUrl, vnPayConfig.HashSecret);
                     if (paymentUrl != null)
                     {
-                       /* _cacheService.SetData<int>(keyForCount, count, DateTimeOffset.UtcNow.AddHours(24));*/
+                        _memoryCache.Set<int>(keyForCount, count, DateTimeOffset.UtcNow.AddHours(24));
                     }
+
                     return paymentUrl;
-                   case 3:
+                case 2:
                     paymentUrl = "";
-                    amount = 200000;
+                    amount = 100000;
                     key = _claimsService.GetCurrentUserId.ToString() + "_" + "Payment";
-                   /* keyForCount = _claimsService.GetCurrentUserId.ToString() + "_" + "Count";
-                    count = _cacheService.GetData<int>(keyForCount);
+                    keyForCount = _claimsService.GetCurrentUserId.ToString() + "_" + "Count";
+                    count = _memoryCache.Get<int>(keyForCount);
                     if (count != null)
                     {
                         count++;
-                    }*/
-                    orderId = key;
+                    }
+                    orderId = key + "_" + count;
                     vnpayRequest = new VnPayRequest(vnPayConfig.Version,
                        vnPayConfig.TmnCode, DateTime.UtcNow,
                        _currentUserIp.UserIp, amount, "VND", "other", "Nap tien vao vi", vnPayConfig.ReturnUrl, orderId);
                     paymentUrl = vnpayRequest.GetLink(vnPayConfig.PaymentUrl, vnPayConfig.HashSecret);
                     if (paymentUrl != null)
                     {
-                        /*_cacheService.SetData<int>(keyForCount, count, DateTimeOffset.UtcNow.AddHours(24));*/
+                        _memoryCache.Set<int>(keyForCount, count, DateTimeOffset.UtcNow.AddHours(24));
+                    }
+                    return paymentUrl;
+                case 3:
+                    paymentUrl = "";
+                    amount = 200000;
+                    key = _claimsService.GetCurrentUserId.ToString() + "_" + "Payment";
+                    keyForCount = _claimsService.GetCurrentUserId.ToString() + "_" + "Count";
+                    count = _memoryCache.Get<int>(keyForCount);
+                    if (count != null)
+                    {
+                        count++;
+                    }
+                    orderId = key+"_"+count;
+                    vnpayRequest = new VnPayRequest(vnPayConfig.Version,
+                       vnPayConfig.TmnCode, DateTime.UtcNow,
+                       _currentUserIp.UserIp, amount, "VND", "other", "Nap tien vao vi", vnPayConfig.ReturnUrl, orderId);
+                    paymentUrl = vnpayRequest.GetLink(vnPayConfig.PaymentUrl, vnPayConfig.HashSecret);
+                    if (paymentUrl != null)
+                    {
+                        _memoryCache.Set<int>(keyForCount, count, DateTimeOffset.UtcNow.AddHours(24));
                     }
                     return paymentUrl;
                 default:
                     return null;
             }
-           
+
         }
 
         public async Task<VnPayIpnResponse> HandleIpn(VnPayResponse vnPayResponse)
         {
-           
+
             var orderId = vnPayResponse.vnp_TxnRef;
             string[] parts = orderId.Split('_');
-            string userId = parts[0];   
+            string userId = parts[0];
             long amount = (long)(vnPayResponse.vnp_Amount / 100);
-            var vnpSecureHash=vnPayResponse.vnp_SecureHash;
+            var vnpSecureHash = vnPayResponse.vnp_SecureHash;
             bool checkValid = vnPayResponse.IsValidSignature(vnPayConfig.HashSecret);
             if (checkValid)
             {
@@ -234,12 +238,12 @@ namespace Application.Service
             else
             {
                 throw new Exception("Has invalid secretkey");
-                
+
             }
             if (await _unitOfWork.SaveChangeAsync() > 0)
             {
                 VnPayIpnResponse successVnPayIpnResponse = new VnPayIpnResponse("00", "Payment success");
-               return successVnPayIpnResponse;
+                return successVnPayIpnResponse;
             }
             else
             {
