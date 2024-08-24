@@ -15,6 +15,7 @@ namespace Infrastructure.EntityConfiguration
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasIndex(x => x.Email).IsUnique(true);
+            builder.Property(x => x.IsMailExisted).IsRequired(false);
             builder.HasData(new User
             {
                 Id = Guid.Parse("27aa7437-5d36-4a01-80e8-7f3e572f6d5c"),
