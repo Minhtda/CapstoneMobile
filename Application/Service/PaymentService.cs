@@ -13,6 +13,7 @@ using System.Text.Json;
 using Application.VnPay.Config;
 using Application.VnPay.Request;
 using Application.VnPay.Response;
+using Hangfire;
 namespace Application.Service
 {
     public class PaymentService : IPaymentService
@@ -22,14 +23,16 @@ namespace Application.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentUserIp _currentUserIp;
         private readonly ICurrentTime _currentTime;
+        private readonly IPostService _postService;
         public PaymentService(IOptions<VnPayConfig> vnpayConfig
-            , IClaimService claimsService,IUnitOfWork unitOfWork,ICurrentUserIp currentUserIp,ICurrentTime currentTime)
+            , IClaimService claimsService,IUnitOfWork unitOfWork,ICurrentUserIp currentUserIp,ICurrentTime currentTime, IPostService postService)
         {
             this.vnPayConfig = vnpayConfig. Value;
             _claimsService = claimsService;
             _unitOfWork = unitOfWork;
             _currentUserIp = currentUserIp;
             _currentTime = currentTime;
+            _postService = postService;
         }
 
         public async Task<bool> BuySubscription(Guid subscriptionId)
@@ -75,9 +78,65 @@ namespace Application.Service
             _unitOfWork.WalletRepository.Update(wallet);
             await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
             await _unitOfWork.SubscriptionHistoryRepository.AddAsync(subcriptionHistory);
-          return await _unitOfWork.SaveChangeAsync()>0;
+            BackgroundJob.Schedule(() => (ExtendSubscriptionByUserId(_claimsService.GetCurrentUserId)), TimeSpan.FromDays(subscription.ExpiryDay));
+            return await _unitOfWork.SaveChangeAsync()>0;
         }
+        public async Task<bool> ExtendSubscriptionByUserId(Guid userId)
+        {
+            var isExtended = false;
+            var wallet = await _unitOfWork.WalletRepository.GetUserWalletByUserId(userId);
+            var subscriptionHistoriesViewModel = await _unitOfWork.SubscriptionHistoryRepository.GetCurrentUserAvailableSubscripion(userId);
+            foreach (var subscriptionHistoryViewModel in subscriptionHistoriesViewModel)
+            {
+                var subscription = await _unitOfWork.SubcriptionRepository.GetByIdAsync(subscriptionHistoryViewModel.SubscriptionId);
+                var subscriptionHistory = await _unitOfWork.SubscriptionHistoryRepository.GetByIdAsync(subscriptionHistoryViewModel.Id);
+                if (subscriptionHistory.IsExtend == false)
+                {
+                    isExtended = false;
+                }
+                else
+                {
+                    var wallletTransaction = await _unitOfWork.WalletTransactionRepository.GetAllTransactionByUserId(userId);
+                    float pendingTransaction = wallletTransaction?.Where(item => item.Action == "Purchase pending").Sum(item => item.Amount) ?? 0;
+                    float cancleTransaction = wallletTransaction?.Where(item => item.Action == "Cancelled Pending").Sum(item => item.Amount) ?? 0;
+                    float deniedTransaction = wallletTransaction?.Where(item => item.Action == "Purchase denied").Sum(item => item.Amount) ?? 0;
+                    if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction < subscription.Price)
+                    {
+                        WalletTransaction walletTransaction = new WalletTransaction()
+                        {
+                            TransactionType = "Extend subscription failed,user balance is not enough",
+                            WalletId = wallet.Id
+                        };
+                        subscriptionHistory.Status = false;
+                        _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
+                        _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
+                    }
+                    else
+                    {
+                        wallet.UserBalance = wallet.UserBalance - subscription.Price;
+                        WalletTransaction walletTransaction = new WalletTransaction()
+                        {
+                            TransactionType = "Extend subscription successfully",
+                            WalletId = wallet.Id,
+                            Amount = subscription.Price
+                        };
+                        subscriptionHistory.Status = true;
+                        subscriptionHistory.EndDate = subscriptionHistory.EndDate.AddDays(subscription.ExpiryDay);
+                        _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
+                        _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
+                        _unitOfWork.WalletRepository.Update(wallet);
+                        isExtended = await _unitOfWork.SaveChangeAsync() > 0;
+                    }
+                }
 
+            }
+            if (!isExtended)
+            {
+                var checkDelete = await _postService.RemovePostWhenSubscriptionExpireByUserId(userId);
+                return checkDelete;
+            }
+            return isExtended;
+        }
         public string GetPayemntUrl(int choice)
         {
             switch (choice)

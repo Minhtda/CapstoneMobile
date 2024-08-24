@@ -33,5 +33,6 @@ namespace Application.InterfaceService
         Task<bool> RemovePostWhenSubscriptionExpire();
         Task<List<PostViewModelForFeaturedImage>> GetFeaturedImage();
         Task<List<PostViewModel>> GetMatchingPost(string title);
+        Task<bool> RemovePostWhenSubscriptionExpireByUserId(Guid userId);
     }
 }
