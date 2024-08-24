@@ -14,7 +14,7 @@ namespace Application.InterfaceRepository
         Task<List<Post>> GetAllPostsWithDetailsAsync();
         Task<List<Post>> GetAllPostsWithDetailsSortByCreationDayAsync(Guid currentUserId);
         Task<List<Post>> GetAllPostsByCreatedByIdAsync(Guid id);
-        Task<List<Post>> SortPostByProductCategoryAsync(int categoryId);
+        Task<List<Post>> SortPostByProductCategoryAsync(int categoryId,Guid userId);
         Task<PostDetailViewModel> GetPostDetail(Guid postId);
         Task<List<PostViewModel>> SearchPostByProductName (string productName);
         Task<List<PostViewModel>> GetAllPost(Guid userId);
