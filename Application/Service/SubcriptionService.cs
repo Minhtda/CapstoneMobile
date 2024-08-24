@@ -38,7 +38,7 @@ namespace Application.Service
         {
             var isExtended = false;
             Wallet wallet = new Wallet();
-           var listUser=await _unitOfWork.UserRepository.GetAllMember();
+            var listUser=await _unitOfWork.UserRepository.GetAllMember();
             foreach(var user in listUser)
             { 
                 try
@@ -70,41 +70,45 @@ namespace Application.Service
                     {
                         isExtended= false;
                     }
-                    if (subscriptionHistory.EndDate >= _currentTime.GetCurrentTime())
-                    {
-                        isExtended= false;
-                    }
                     else
                     {
-                        var wallletTransaction = await _unitOfWork.WalletTransactionRepository.GetAllTransactionByUserId(user.Id);
-                        float pendingTransaction = wallletTransaction?.Where(item => item.Action == "Purchase pending").Sum(item => item.Amount) ?? 0;
-                        float cancleTransaction = wallletTransaction?.Where(item => item.Action == "Cancelled Pending").Sum(item => item.Amount) ?? 0;
-                        float deniedTransaction = wallletTransaction?.Where(item => item.Action == "Purchase denied").Sum(item => item.Amount) ?? 0;
-                        if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction < subscription.Price)
+                        if (subscriptionHistory.EndDate >= _currentTime.GetCurrentTime())
                         {
-                            WalletTransaction walletTransaction = new WalletTransaction()
-                            {
-                                TransactionType="Extend subscription failed,user balance is not enough",
-                                WalletId=wallet.Id
-                            };
-                             subscriptionHistory.Status = false;
-                            _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
-                            _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
-                        } else
+                            isExtended = false;
+                        }
+                        else
                         {
-                            wallet.UserBalance=wallet.UserBalance-subscription.Price;
-                            WalletTransaction walletTransaction = new WalletTransaction()
+                            var wallletTransaction = await _unitOfWork.WalletTransactionRepository.GetAllTransactionByUserId(user.Id);
+                            float pendingTransaction = wallletTransaction?.Where(item => item.Action == "Purchase pending").Sum(item => item.Amount) ?? 0;
+                            float cancleTransaction = wallletTransaction?.Where(item => item.Action == "Cancelled Pending").Sum(item => item.Amount) ?? 0;
+                            float deniedTransaction = wallletTransaction?.Where(item => item.Action == "Purchase denied").Sum(item => item.Amount) ?? 0;
+                            if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction < subscription.Price)
                             {
-                                TransactionType = "Extend subscription successfully",
-                                WalletId=wallet.Id,
-                                Amount=subscription.Price
-                            };
-                            subscriptionHistory.Status = true;
-                            subscriptionHistory.EndDate=subscriptionHistory.EndDate.AddDays(subscription.ExpiryDay);
-                            _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
-                            _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
-                            _unitOfWork.WalletRepository.Update(wallet);
-                            isExtended = await _unitOfWork.SaveChangeAsync() > 0;
+                                WalletTransaction walletTransaction = new WalletTransaction()
+                                {
+                                    TransactionType = "Extend subscription failed,user balance is not enough",
+                                    WalletId = wallet.Id
+                                };
+                                subscriptionHistory.Status = false;
+                                _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
+                                _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
+                            }
+                            else
+                            {
+                                wallet.UserBalance = wallet.UserBalance - subscription.Price;
+                                WalletTransaction walletTransaction = new WalletTransaction()
+                                {
+                                    TransactionType = "Extend subscription successfully",
+                                    WalletId = wallet.Id,
+                                    Amount = subscription.Price
+                                };
+                                subscriptionHistory.Status = true;
+                                subscriptionHistory.EndDate = subscriptionHistory.EndDate.AddDays(subscription.ExpiryDay);
+                                _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
+                                _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
+                                _unitOfWork.WalletRepository.Update(wallet);
+                                isExtended = await _unitOfWork.SaveChangeAsync() > 0;
+                            }
                         }
                     }
                 }
