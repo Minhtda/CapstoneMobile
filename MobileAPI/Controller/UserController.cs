@@ -45,6 +45,13 @@ namespace MobileAPI.Controllers
             var newToken = await _userService.Login(loginModel, apiOrigin);
             return Ok(newToken);
         }
+        [HttpPost]
+        public async Task<IActionResult> LoginWithToken(LoginModel loginModel, string mobileToken)
+        {
+            string apiOrigin = "Mobile";
+            var newToken = await _userService.LoginWithNoti(loginModel, apiOrigin, mobileToken);
+            return Ok(newToken);
+        }
         [HttpGet]
         public async Task<IActionResult> SendVerificationCode(string email)
         {
@@ -89,6 +96,20 @@ namespace MobileAPI.Controllers
                 return Ok();
             }
             return BadRequest();
+        }
+        [HttpPost]
+        public async Task<IActionResult> LoginGoogleWithToken(string Token, string mobileToken)
+        {
+            string apiOrigin = "Mobile";
+            var newToken = await _userService.LoginGoogleWithNoti(Token, apiOrigin, mobileToken);
+            if (newToken == null)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(newToken);
+            }
         }
         [HttpPost]
         public async Task<IActionResult> LoginGoogle(string Token)
