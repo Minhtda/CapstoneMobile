@@ -98,6 +98,7 @@ namespace Application.Service
             {
                 amount = policy.FirstOrDefault().OrderCancelledAmount;
             }
+            var checkAlreadyOrder = false;
             if (duplicateOrder != null)
             {
                 var recentOrder = duplicateOrder.OrderByDescending(x => x.CreationDate).FirstOrDefault();
@@ -109,6 +110,10 @@ namespace Application.Service
                         {
                             throw new Exception("You have cancelled this post too many times");
                         }
+                    }
+                    else
+                    {
+                        checkAlreadyOrder = true;
                     }
                 }
             }
@@ -124,31 +129,32 @@ namespace Application.Service
             {
                 throw new Exception("You don't have enough money to order this transaction");
             }
-
-            var order = new Order
+            if (!checkAlreadyOrder)
             {
-                PostId = postId,
-                OrderStatusId = 1,
-                OrderMessage = "",
-                UserId = user2,
-                CreatedBy = user2,
-            };
-            await _unitOfWork.OrderRepository.AddAsync(order);
-            await _unitOfWork.SaveChangeAsync();
-
-            if (postForProductPrice.ConditionTypeId == 1)
-            {
-                var newWalletTransaction = new WalletTransaction
+                var order = new Order
                 {
-                    OrderId = order.Id,
-                    Amount = postForProductPrice.ProductPrice,
-                    TransactionType = "Purchase pending",
-                    WalletId = wallet.Id,
+                    PostId = postId,
+                    OrderStatusId = 1,
+                    OrderMessage = "",
+                    UserId = user2,
+                    CreatedBy = user2,
                 };
-                await _unitOfWork.WalletTransactionRepository.AddAsync(newWalletTransaction);
+                await _unitOfWork.OrderRepository.AddAsync(order);
                 await _unitOfWork.SaveChangeAsync();
-            }
 
+                if (postForProductPrice.ConditionTypeId == 1)
+                {
+                    var newWalletTransaction = new WalletTransaction
+                    {
+                        OrderId = order.Id,
+                        Amount = postForProductPrice.ProductPrice,
+                        TransactionType = "Purchase pending",
+                        WalletId = wallet.Id,
+                    };
+                    await _unitOfWork.WalletTransactionRepository.AddAsync(newWalletTransaction);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+            }
             var duplicateMessage = await _unitOfWork.MessageRepository.getByContent("Tôi đang có hứng thú với món đồ " + postForProductPrice.PostTitle);
             if (duplicateMessage == null)
             {

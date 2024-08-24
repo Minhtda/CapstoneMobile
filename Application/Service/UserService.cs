@@ -460,5 +460,157 @@ namespace Application.Service
         {
             return await _unitOfWork.UserRepository.GetAllUserForWeb();
         }
+
+        public async Task<Token> LoginGoogleWithNoti(string token, string apiOrigin, string machineToken)
+        {
+            try
+            {
+                var payload = await GoogleJsonWebSignature.ValidateAsync(token);
+                string email = payload.Email;
+                string firstName = payload.GivenName;
+                string lastName = payload.FamilyName;
+                string pictureUrl = _ImageUrl;
+                var loginUser = await _unitOfWork.UserRepository.FindUserByEmail(email);
+                if (loginUser.IsDelete == true)
+                {
+                    throw new Exception("You have been banned");
+                }
+                if (loginUser == null)
+                {
+                    var newAcc = new User()
+                    {
+                        Email = email,
+                        RoleId = 3,
+                        IsDelete = false,
+                        UserName = firstName + " " + lastName,
+                        FirstName = firstName,
+                        LastName = lastName,
+                        PasswordHash = " ",
+                        PhoneNumber = " ",
+                        ProfileImage = pictureUrl,
+                        IsBuisnessAccount = false,
+                        HomeAddress = "string",
+                        WalletId = new Guid(),
+                    };
+                    await _unitOfWork.UserRepository.AddAsync(newAcc);
+                    var changesSaved = await _unitOfWork.SaveChangeAsync();
+                    loginUser = await _unitOfWork.UserRepository.FindUserByEmail(email);
+                }
+                if (loginUser.VerifyUserId == null)
+                {
+                    var verifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserIdForRegister(loginUser.Id);
+                    if (verifyUser == null)
+                    {
+                        var verifyUserId = await CreateVerifyUser(loginUser.Id);
+                        loginUser.VerifyUserId = verifyUserId;
+                        _unitOfWork.UserRepository.Update(loginUser);
+                        await _unitOfWork.SaveChangeAsync();
+                    }
+                }
+                if (loginUser.WalletId == new Guid())
+                {
+                    var wallet = await _unitOfWork.WalletRepository.FindWalletByUserId(loginUser.Id);
+                    if (wallet == null)
+                    {
+                        var walletId = await CreateWallet(loginUser.Id);
+                        loginUser.WalletId = walletId;
+                        _unitOfWork.UserRepository.Update(loginUser);
+                        await _unitOfWork.SaveChangeAsync();
+                    }
+                }
+                if (machineToken != null)
+                {
+                    loginUser.Token = machineToken;
+                    _unitOfWork.UserRepository.Update(loginUser);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+                var accessToken = loginUser.GenerateTokenString(_appConfiguration!.JWTSecretKey, _currentTime.GetCurrentTime());
+                var refreshToken = RefreshToken.GetRefreshToken();
+                /* var key = loginUser.Id.ToString() + "_" + apiOrigin;*/
+                /*var cacheData = _cacheService.SetData<string>(key, refreshToken, _currentTime.GetCurrentTime().AddDays(2));*/
+                return new Token
+                {
+                    userId = loginUser.Id,
+                    userName = loginUser.UserName,
+                    accessToken = accessToken,
+                    refreshToken = refreshToken,
+                };
+            }
+            catch (InvalidJwtException ex)
+            {
+                // Token is invalid
+                throw new Exception("Invalid token", ex);
+            }
+            catch (Exception ex)
+            {
+                // Other exceptions
+                throw new Exception("Failed to validate token", ex);
+            }
+        }
+
+        public async Task<Token> LoginWithNoti(LoginModel loginModel, string apiOrigin, string machineToken)
+        {
+            var user = await _unitOfWork.UserRepository.FindUserByEmail(loginModel.Email);
+            if (user == null)
+            {
+                throw new Exception("Email do not exist");
+            }
+            if (!loginModel.Password.CheckPassword(user.PasswordHash))
+            {
+                throw new Exception("Password is not correct");
+            }
+            if (user.IsDelete == true)
+            {
+                throw new Exception("You have been banned");
+            }
+            if (machineToken != null)
+            {
+                user.Token = machineToken;
+                _unitOfWork.UserRepository.Update(user);
+                await _unitOfWork.SaveChangeAsync();
+            }
+            var findKey = user.Id.ToString() + "_" + apiOrigin;
+            var accessToken = user.GenerateTokenString(_appConfiguration!.JWTSecretKey, _currentTime.GetCurrentTime());
+            var refreshToken = RefreshToken.GetRefreshToken();
+            /*var key = user.Id.ToString() + "_" + apiOrigin;*/
+            /*var accessTokenKey = user.Id.ToString() + "_" + "accesstoken";*/
+            /*   var cacheData = _cacheService.SetData<string>(key, refreshToken, _currentTime.GetCurrentTime().AddDays(2));
+               var accessTokeData = _cacheService.SetData<string>(accessTokenKey, accessToken, _currentTime.GetCurrentTime().AddDays(2));*/
+            /*  Wallet findUserWallet = null;
+              VerifyUser checkVerifyUser = null;*/
+            /*  if (user.RoleId == 3)
+              {
+                  findUserWallet = await _unitOfWork.WalletRepository.FindWalletByUserId(user.Id);
+                  checkVerifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserId(user.Id);
+              }*/
+
+            /*   user.ProfileImage = "https://firebasestorage.googleapis.com/v0/b/firestorage-4ee45.appspot.com/o/Product%2Favatar-trang-4.jpg?alt=media&token=b5970145-10b1-4adf-b04a-2b73b9aa6088";
+               _unitOfWork.UserRepository.Update(user);*/
+            /*  await _unitOfWork.SaveChangeAsync();*/
+            /*if (user.RoleId == 3)
+            {
+                if (findUserWallet == null)
+                {
+                    var walletId = await CreateWallet(user.Id);
+                    user.WalletId = walletId;
+                    _unitOfWork.UserRepository.Update(user);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+                if (checkVerifyUser == null)
+                {
+                    var verfiyUserId = await CreateVerifyUser(user.Id);
+                    user.VerifyUserId = verfiyUserId;
+                    _unitOfWork.UserRepository.Update(user);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+            }*/
+            return new Token
+            {
+                userId = user.Id,
+                userName = user.UserName,
+                accessToken = accessToken,
+                refreshToken = refreshToken,
+            };
+        }
     }
 }
