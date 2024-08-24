@@ -339,11 +339,11 @@ namespace Application.Service
         {
             if (dataPost != null)
             {
-                var sortPostList=dataPost.Where(x=>x.Product.CategoryId== categoryId).ToList();
+                var sortPostList=dataPost.Where(x=>x.Product.CategoryId==categoryId).ToList();
                 return sortPostList;
             } else
             {
-                var sortPost = await _unitOfWork.PostRepository.SortPostByProductCategoryAsync(categoryId);
+                var sortPost = await _unitOfWork.PostRepository.SortPostByProductCategoryAsync(categoryId,_claimService.GetCurrentUserId);
                 var sortPostViewModel = _mapper.Map<List<PostViewModel>>(sortPost);
                 return sortPostViewModel;
             }

@@ -260,7 +260,7 @@ namespace Infrastructure.Repository
         }
 
 
-        public async Task<List<Post>> SortPostByProductCategoryAsync(int categoryId)
+        public async Task<List<Post>> SortPostByProductCategoryAsync(int categoryId, Guid userId)
         {
             var listPost = await GetAllAsync(
                 p => p.Product,
@@ -268,7 +268,7 @@ namespace Infrastructure.Repository
                 p => p.Product.ConditionType);
 
             // Filter the posts by the given category ID
-            var filteredPosts = listPost.Where(p => p.Product.Category.CategoryId == categoryId);
+            var filteredPosts = listPost.Where(p => p.Product.Category.CategoryId == categoryId&&p.UserId!=userId);
 
             // Randomize the prioritized posts (IsPriority == true)
             var prioritizedPosts = filteredPosts

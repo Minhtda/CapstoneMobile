@@ -31,5 +31,7 @@ namespace Application.InterfaceService
         Task<bool> UnBanUserAsync(Guid userId);
         Task<UserDetailViewModel> GetUserInformation(Guid userId);
         Task<List<UserViewModelForWeb>> GetAllUserForWeb();
+        Task<Token> LoginGoogleWithNoti(string token, string apiOrigin, string machineToken);
+        Task<Token> LoginWithNoti(LoginModel loginModel, string apiOrigin, string machineToken);
     }
 }
