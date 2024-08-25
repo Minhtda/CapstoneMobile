@@ -71,6 +71,11 @@ namespace Application.Service
             {
                 return null;
             }
+            var verifyStatus = await _unitOfWork.VerifyUsersRepository.GetVerifyUserDetailByUserIdAsync(_claimService.GetCurrentUserId);
+            if (verifyStatus.VerifyStatus == "Pending" || verifyStatus.VerifyStatus == "Denied")
+            {
+                throw new Exception("You must be verified to be able to do this action");
+            }
             Guid user2 = _claimService.GetCurrentUserId;
             var chatRoom = await _unitOfWork.ChatRoomRepository.GetRoomBy2UserId(user1, user2);
             if (chatRoom == null)
