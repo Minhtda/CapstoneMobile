@@ -53,7 +53,7 @@ namespace Application.Service
             {
                 if (post.ConditionTypeId == 1)
                 {
-                    BackgroundJob.Schedule(() => (ChangeOrderStatus(OrderId, _accept)), TimeSpan.FromHours(12));
+                    BackgroundJob.Schedule(() => (ChangeOrderStatus(OrderId, _accept)), TimeSpan.FromSeconds(10));
                 }
             }
             return await _unitOfWork.SaveChangeAsync()>0;
