@@ -177,6 +177,7 @@ namespace Application.Service
                         Product = newProduct,
                         UserId = _claimService.GetCurrentUserId,
                         IsPriority = false,
+                        PaymentType=postModel.PaymentType
                     };
                     var walletTransaction = new WalletTransaction()
                     {
@@ -209,7 +210,8 @@ namespace Application.Service
                     PostContent = postModel.PostContent,
                     Product = newProduct,
                     UserId = _claimService.GetCurrentUserId,
-                    IsPriority = true
+                    IsPriority = true,
+                    PaymentType=postModel.PaymentType
                 };
                 await _unitOfWork.PostRepository.AddAsync(createPost);
             }
