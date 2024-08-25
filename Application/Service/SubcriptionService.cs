@@ -68,7 +68,12 @@ namespace Application.Service
                     var subscriptionHistory = await _unitOfWork.SubscriptionHistoryRepository.GetByIdAsync(subscriptionHistoryViewModel.Id);
                     if (subscriptionHistory.IsExtend == false)
                     {
-                        isExtended= false;
+                        if (subscriptionHistory.EndDate <= _currentTime.GetCurrentTime())
+                        {
+                            subscriptionHistory.Status = false;
+                            _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
+                            await _unitOfWork.SaveChangeAsync();
+                        }
                     }
                     else
                     {
@@ -87,11 +92,13 @@ namespace Application.Service
                                 WalletTransaction walletTransaction = new WalletTransaction()
                                 {
                                     TransactionType = "Extend subscription failed,user balance is not enough",
+                                    Amount = 0,
                                     WalletId = wallet.Id
                                 };
                                 subscriptionHistory.Status = false;
                                 _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
                                 _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
+                                await _unitOfWork.SaveChangeAsync();
                             }
                             else
                             {
