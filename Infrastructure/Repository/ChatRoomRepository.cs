@@ -24,35 +24,36 @@ namespace Infrastructure.Repository
         {
             // Fetch only the required fields using projection to reduce memory overhead
             var rooms = await _appDbContext.ChatRooms
-                                    .Where(m => (m.SenderId == userId || m.ReceiverId == userId) && m.IsDelete == false)
-                                    .Select(room => new
-                                    {
-                                        room.Id,
-                                        room.SenderId,
-                                        room.ReceiverId,
-                                        SenderUserName = room.Sender.UserName,
-                                        ReceiverUserName = room.Receiver.UserName,
-                                        SenderAvatar = room.Sender.ProfileImage,
-                                        ReceiverAvatar = room.Receiver.ProfileImage,
-                                        Messages = room.Messages
-                                                    .OrderByDescending(m => m.CreationDate)
-                                                    .Select(m => new
-                                                    {
-                                                        m.Id,
-                                                        m.MessageContent,
-                                                        m.CreatedBy,
-                                                        m.CreationDate
-                                                    }).ToList(),
-                                        Orders = _appDbContext.Orders
-                                                    .Where(o => o.Post.CreatedBy == room.ReceiverId && o.UserId == room.SenderId)
-                                                    .Select(o => new
-                                                    {
-                                                        o.Id,
-                                                        o.OrderStatusId
-                                                    }).ToList()
-                                    })
-                                    .AsNoTracking() // Improves performance for read-only data
-                                    .ToListAsync();
+                .Where(m => (m.SenderId == userId || m.ReceiverId == userId) && m.IsDelete == false)
+                .Select(room => new
+                {
+                    room.Id,
+                    room.SenderId,
+                    room.ReceiverId,
+                    SenderUserName = room.Sender.UserName,
+                    ReceiverUserName = room.Receiver.UserName,
+                    SenderAvatar = room.Sender.ProfileImage,
+                    ReceiverAvatar = room.Receiver.ProfileImage,
+                    Messages = room.Messages
+                        .Select(m => new
+                        {
+                            m.Id,
+                            m.MessageContent,
+                            m.CreatedBy,
+                            m.CreationDate
+                        }).ToList(),
+                    Orders = _appDbContext.Orders
+                        .Where(o => o.Post.CreatedBy == room.ReceiverId && o.UserId == room.SenderId)
+                        .Select(o => new
+                        {
+                            o.Id,
+                            o.OrderStatusId
+                        }).ToList(),
+                    LastMessageDate = room.Messages.Max(m => m.CreationDate) // Get the latest message creation date
+                })
+                .OrderByDescending(room => room.LastMessageDate) // Order by the latest message creation date descending
+                .AsNoTracking() // Improves performance for read-only data
+                .ToListAsync();
 
             // Map entities to DTOs
             var roomDtos = rooms.Select(room => new ChatRoomWithOrder
@@ -81,6 +82,7 @@ namespace Infrastructure.Repository
 
             return roomDtos;
         }
+
         public async Task<ChatRoomWithOrder> GetMessagesByRoomId(Guid roomId)
         {
             var chatRoom = await _appDbContext.ChatRooms.Where(m => m.Id == roomId).
