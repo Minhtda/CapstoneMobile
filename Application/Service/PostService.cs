@@ -472,5 +472,31 @@ namespace Application.Service
             }
             return isDeleted;
         }
+
+        public async Task<bool> RemovePostDonationWhenOrderConfirm()
+        {
+            bool isDeleted = false;
+            var listUser = await _unitOfWork.UserRepository.GetAllMember();
+            foreach (var user in listUser)
+            {
+                var listPostCreatedByUser = await _unitOfWork.PostRepository.GetAllPostsByCreatedByIdAsync(user.Id);
+                if (listPostCreatedByUser != null)
+                {
+                    foreach (var post in listPostCreatedByUser)
+                    {
+                        if (post.Product.ConditionId == 3)
+                        {
+                            var order = await _unitOfWork.OrderRepository.GetOrderByPostId(post.Id);
+                            if (order.Any(x => x.OrderStatusId == 5))
+                            {
+                                _unitOfWork.PostRepository.SoftRemove(post);
+                                isDeleted = await _unitOfWork.SaveChangeAsync() > 0;
+                            }
+                        }
+                    }
+                }
+            }
+            return isDeleted;
+        }
     }
 }
