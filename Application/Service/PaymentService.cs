@@ -56,7 +56,8 @@ namespace Application.Service
             float pendingTransaction = wallletTransaction?.Where(item => item.Action == "Purchase pending").Sum(item => item.Amount) ?? 0;
             float cancleTransaction = wallletTransaction?.Where(item => item.Action == "Cancelled Pending").Sum(item => item.Amount) ?? 0;
             float deniedTransaction = wallletTransaction?.Where(item => item.Action == "Purchase denied").Sum(item => item.Amount) ?? 0;
-            if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction < (float)subscription.Price)
+            float completeTransaction = wallletTransaction?.Where(item => item.Action == "Purchase complete").Sum(item => item.Amount) ?? 0;
+            if (userWallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction + completeTransaction < (float)subscription.Price)
             {
                 throw new Exception("User balance not enough to purchase");
             }
