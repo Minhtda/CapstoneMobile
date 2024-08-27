@@ -261,7 +261,7 @@ namespace Application.Service
                         PhoneNumber = " ",
                         ProfileImage = pictureUrl,
                         IsBuisnessAccount = false,
-                        HomeAddress="string",
+                        HomeAddress="HCM",
                         WalletId = new Guid(),
                     };
                     await _unitOfWork.UserRepository.AddAsync(newAcc);
