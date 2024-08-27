@@ -82,7 +82,8 @@ namespace Application.Service
             _unitOfWork.WalletRepository.Update(wallet);
             await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
             await _unitOfWork.SubscriptionHistoryRepository.AddAsync(subcriptionHistory);
-            BackgroundJob.Schedule(() => (ExtendSubscriptionByUserId(_claimsService.GetCurrentUserId)), TimeSpan.FromDays(subscription.ExpiryDay));
+            var currentUserId = _claimsService.GetCurrentUserId;
+            BackgroundJob.Schedule(() => (ExtendSubscriptionByUserId(currentUserId)), TimeSpan.FromDays(subscription.ExpiryDay));
             return await _unitOfWork.SaveChangeAsync() > 0;
         }
         public async Task<bool> ExtendSubscriptionByUserId(Guid userId)
@@ -136,6 +137,7 @@ namespace Application.Service
                         _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
                         _unitOfWork.WalletRepository.Update(wallet);
                         isExtended = await _unitOfWork.SaveChangeAsync() > 0;
+                        BackgroundJob.Schedule(() => (ExtendSubscriptionByUserId(userId)), TimeSpan.FromDays(subscription.ExpiryDay));
                     }
                 }
 
