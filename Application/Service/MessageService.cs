@@ -71,6 +71,11 @@ namespace Application.Service
             {
                 return null;
             }
+            var verifyStatus = await _unitOfWork.VerifyUsersRepository.GetVerifyUserDetailByUserIdAsync(_claimService.GetCurrentUserId);
+            if (verifyStatus.VerifyStatus == "Pending" || verifyStatus.VerifyStatus == "Denied")
+            {
+                throw new Exception("You must be verified to be able to do this action");
+            }
             Guid user2 = _claimService.GetCurrentUserId;
             var chatRoom = await _unitOfWork.ChatRoomRepository.GetRoomBy2UserId(user1, user2);
             if (chatRoom == null)
@@ -122,12 +127,16 @@ namespace Application.Service
             var wallet = await _unitOfWork.WalletRepository.GetUserWalletByUserId(user2);
             var wallletTransaction = await _unitOfWork.WalletTransactionRepository.GetAllTransactionByUserId(user2);
             var postForProductPrice = await _unitOfWork.PostRepository.GetPostDetail(postId);
-            float pendingTransaction = wallletTransaction?.Where(item => item.Action == "Purchase pending").Sum(item => item.Amount) ?? 0;
-            float cancleTransaction = wallletTransaction?.Where(item => item.Action == "Cancelled Pending").Sum(item => item.Amount) ?? 0;
-            float deniedTransaction = wallletTransaction?.Where(item => item.Action == "Purchase denied").Sum(item => item.Amount) ?? 0;
-            if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction < postForProductPrice.ProductPrice)
+            if (postForProductPrice.ConditionTypeId == 1)
             {
-                throw new Exception("You don't have enough money to order this transaction");
+                float pendingTransaction = wallletTransaction?.Where(item => item.Action == "Purchase pending").Sum(item => item.Amount) ?? 0;
+                float cancleTransaction = wallletTransaction?.Where(item => item.Action == "Cancelled Pending").Sum(item => item.Amount) ?? 0;
+                float deniedTransaction = wallletTransaction?.Where(item => item.Action == "Purchase denied").Sum(item => item.Amount) ?? 0;
+                float completeTransaction = wallletTransaction?.Where(item => item.Action == "Purchase complete").Sum(_ => _.Amount) ?? 0;
+                if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction + completeTransaction < postForProductPrice.ProductPrice)
+                {
+                    throw new Exception("You don't have enough money to order this transaction");
+                }
             }
             if (!checkAlreadyOrder)
             {
