@@ -30,7 +30,7 @@ namespace MobileAPI.Controllers
         public async Task<IActionResult> VnPayRedirect([FromQuery] VnPayResponse vnPayResponse)
         {
             var isUpdated = await _paymentService.HandleIpn(vnPayResponse);
-            if (isUpdated.RspCode=="00")
+            if (isUpdated)
             {
                 string exePath = Environment.CurrentDirectory.ToString();
                 string FilePath = exePath + @"/PaymentTemplate/PaymentSuccessful.html";

@@ -221,9 +221,9 @@ namespace Application.Service
 
         }
 
-        public async Task<VnPayIpnResponse> HandleIpn(VnPayResponse vnPayResponse)
+        public async Task<bool> HandleIpn(VnPayResponse vnPayResponse)
         {
-
+            bool isUpdated = false;
             var orderId = vnPayResponse.vnp_TxnRef;
             string[] parts = orderId.Split('_');
             string userId = parts[0];
@@ -232,17 +232,24 @@ namespace Application.Service
             bool checkValid = vnPayResponse.IsValidSignature(vnPayConfig.HashSecret);
             if (checkValid)
             {
-                Guid checkUserId = Guid.Parse(userId);
-                var userWallet = await _unitOfWork.WalletRepository.FindWalletByUserId(checkUserId);
-                userWallet.UserBalance += amount;
-                WalletTransaction walletTransaction = new WalletTransaction()
+                if (vnPayResponse.vnp_TransactionStatus != "00")
                 {
-                    TransactionType = "Deposit into Wallet",
-                    WalletId = userWallet.Id,
-                    Amount = (float)amount,
-                };
-                _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
-                _unitOfWork.WalletRepository.Update(userWallet);
+                    isUpdated = false;
+                } else
+                {
+                    Guid checkUserId = Guid.Parse(userId);
+                    var userWallet = await _unitOfWork.WalletRepository.FindWalletByUserId(checkUserId);
+                    userWallet.UserBalance += amount;
+                    WalletTransaction walletTransaction = new WalletTransaction()
+                    {
+                        TransactionType = "Deposit into Wallet",
+                        WalletId = userWallet.Id,
+                        Amount = (float)amount,
+                    };
+                    _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
+                    _unitOfWork.WalletRepository.Update(userWallet);
+                }
+                
             }
             else
             {
@@ -251,13 +258,13 @@ namespace Application.Service
             }
             if (await _unitOfWork.SaveChangeAsync() > 0)
             {
-                VnPayIpnResponse successVnPayIpnResponse = new VnPayIpnResponse("00", "Payment success");
-                return successVnPayIpnResponse;
+                isUpdated = true;
+                return isUpdated;
             }
             else
             {
-                VnPayIpnResponse errorVnPayIpnResponse = new VnPayIpnResponse("02", "Payment error");
-                return errorVnPayIpnResponse;
+                isUpdated = false;
+                return isUpdated;
             }
         }
 
