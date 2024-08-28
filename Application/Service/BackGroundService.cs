@@ -126,12 +126,9 @@ namespace Application.Service
                 var subscriptionHistory = await _unitOfWork.SubscriptionHistoryRepository.GetByIdAsync(subscriptionHistoryViewModel.Id);
                 if (subscriptionHistory.IsExtend == false)
                 {
-                    if (subscriptionHistory.EndDate <= _currentTime.GetCurrentTime())
-                    {
-                        subscriptionHistory.Status = false;
-                        _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
-                        await _unitOfWork.SaveChangeAsync();
-                    }
+                    subscriptionHistory.Status = false;
+                    _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
+                    await _unitOfWork.SaveChangeAsync();
                 }
                 else
                 {
