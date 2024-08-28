@@ -31,7 +31,8 @@ namespace Infrastructure.Repository
             // Get the prioritized posts and randomize them
             var prioritizedPosts = await _appDbContext.Posts
                 .Where(x => x.IsDelete == false && x.CreatedBy != userId && x.IsPriority == true)
-                 // Randomize
+                .OrderByDescending(p => p.CreationDate)
+                // Randomize
                 .Include(x => x.Product)
                     .ThenInclude(p => p.Category)
                 .Include(x => x.Product)
@@ -119,7 +120,7 @@ namespace Infrastructure.Repository
             );
             // Randomize the prioritized posts (IsPriority == true)
             var prioritizedPosts = posts
-                .Where(p => p.IsPriority == true)
+                .Where(p => p.IsPriority == true).OrderByDescending(p => p.CreationDate)
                 ;
 
             // Sort the non-prioritized posts (IsPriority is false or null) by CreationDate
