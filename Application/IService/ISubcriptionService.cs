@@ -13,7 +13,6 @@ namespace Application.InterfaceService
         Task<bool> CreateSubcription(CreateSubcriptionModel createSubcriptionModel);
         Task<bool> UpdateSubcription(UpdateSubscriptionModel updateSubcriptionModel);
         Task<List<Subscription>> GetAllSubscriptionAsync();
-        Task<bool> ExtendSubscription();
         Task<bool> DeactiveSubscriptionAsync(Guid subscriptionId);
         Task<bool> RevokeSubscriptionAsync(Guid subscriptionId);
         Task<SubscriptionDetailViewModel> GetSubscriptionDetailAsync(Guid subscriptionId);

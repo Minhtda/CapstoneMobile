@@ -391,54 +391,6 @@ namespace Application.Service
             return await _unitOfWork.SaveChangeAsync() > 0;
         }
 
-        public async Task<bool> RemovePostWhenSubscriptionExpire()
-        {
-            bool isDeleted = false;
-            var listUser = await _unitOfWork.UserRepository.GetAllMember();
-            foreach(var user in listUser)
-            {
-                var listUserPurchaseSubscription=await _unitOfWork.SubscriptionHistoryRepository.GetUserPurchaseSubscription(user.Id);
-               /* var listUserExpireSubscription = await _unitOfWork.SubscriptionHistoryRepository.GetUserExpireSubscription(user.Id);*/
-                if (listUserPurchaseSubscription != null)
-                {
-                    if (listUserPurchaseSubscription.Count() > 0)
-                    {
-                        if (listUserPurchaseSubscription.Where(x => x.Status == "Expried").Count() == listUserPurchaseSubscription.Count())
-                        {
-                            var listPostCreatedByUser = await _unitOfWork.PostRepository.GetAllPostsByCreatedByIdAsync(user.Id);
-                            if (listPostCreatedByUser != null)
-                            {
-                                foreach (var post in listPostCreatedByUser)
-                                {
-                                    if (post.Product.ConditionId != 3 )
-                                    {
-                                        _unitOfWork.PostRepository.SoftRemove(post);
-                                        isDeleted = await _unitOfWork.SaveChangeAsync() > 0;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                } else
-                {
-                    var listPostCreatedByUser = await _unitOfWork.PostRepository.GetAllPostsByCreatedByIdAsync(user.Id);
-                    if (listPostCreatedByUser != null)
-                    {
-                        foreach (var post in listPostCreatedByUser)
-                        {
-                            if (post.Product.ConditionId != 3)
-                            {
-                                _unitOfWork.PostRepository.SoftRemove(post);
-                                isDeleted = await _unitOfWork.SaveChangeAsync() > 0;
-                            }
-                        }
-                    }
-                }
-            }
-            return isDeleted;
-        }
-
         public async Task<List<PostViewModelForFeaturedImage>> GetFeaturedImage()
         {
             var post = await _unitOfWork.PostRepository.GetFeaturedImagePost();
@@ -456,24 +408,6 @@ namespace Application.Service
                             .Take(6);
             }
             return filteredPosts.ToList();
-        }
-
-        public async Task<bool> RemovePostWhenSubscriptionExpireByUserId(Guid userId)
-        {
-            var isDeleted = false;
-            var listPostCreatedByUser = await _unitOfWork.PostRepository.GetAllPostsByCreatedByIdAsync(userId);
-            if (listPostCreatedByUser != null)
-            {
-                foreach (var post in listPostCreatedByUser)
-                {
-                    if (post.Product.ConditionId != 3)
-                    {
-                        _unitOfWork.PostRepository.SoftRemove(post);
-                        isDeleted = await _unitOfWork.SaveChangeAsync() > 0;
-                    }
-                }
-            }
-            return isDeleted;
         }
 
         public async Task<bool> RemovePostDonationWhenOrderConfirm()

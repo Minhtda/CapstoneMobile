@@ -15,6 +15,7 @@ using Application.VnPay.Request;
 using Application.VnPay.Response;
 using Hangfire;
 using Microsoft.Extensions.Caching.Memory;
+using Application.IService;
 namespace Application.Service
 {
     public class PaymentService : IPaymentService
@@ -26,9 +27,10 @@ namespace Application.Service
         private readonly ICurrentTime _currentTime;
         private readonly IPostService _postService;
         private readonly IMemoryCache _memoryCache;
+        private readonly IBackGroundService _backGroundService;
         public PaymentService(IOptions<VnPayConfig> vnpayConfig
             , IClaimService claimsService, IUnitOfWork unitOfWork, ICurrentUserIp currentUserIp, ICurrentTime currentTime,
-            IPostService postService, IMemoryCache memoryCache)
+            IPostService postService, IMemoryCache memoryCache, IBackGroundService backGroundService)
         {
             this.vnPayConfig = vnpayConfig.Value;
             _claimsService = claimsService;
@@ -37,6 +39,7 @@ namespace Application.Service
             _currentTime = currentTime;
             _postService = postService;
             _memoryCache = memoryCache;
+            _backGroundService = backGroundService;
         }
 
         public async Task<bool> BuySubscription(Guid subscriptionId)
@@ -84,72 +87,10 @@ namespace Application.Service
             await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
             await _unitOfWork.SubscriptionHistoryRepository.AddAsync(subcriptionHistory);
             var currentUserId = _claimsService.GetCurrentUserId;
-            BackgroundJob.Schedule(() => (ExtendSubscriptionByUserId(currentUserId)), TimeSpan.FromDays(subscription.ExpiryDay));
+            BackgroundJob.Schedule(() => (_backGroundService.ExtendSubscriptionByUserId(currentUserId)), TimeSpan.FromDays(subscription.ExpiryDay));
             return await _unitOfWork.SaveChangeAsync() > 0;
         }
-        public async Task<bool> ExtendSubscriptionByUserId(Guid userId)
-        {
-            var isExtended = false;
-            var wallet = await _unitOfWork.WalletRepository.GetUserWalletByUserId(userId);
-            var subscriptionHistoriesViewModel = await _unitOfWork.SubscriptionHistoryRepository.GetCurrentUserAvailableSubscripion(userId);
-            foreach (var subscriptionHistoryViewModel in subscriptionHistoriesViewModel)
-            {
-                var subscription = await _unitOfWork.SubcriptionRepository.GetByIdAsync(subscriptionHistoryViewModel.SubscriptionId);
-                var subscriptionHistory = await _unitOfWork.SubscriptionHistoryRepository.GetByIdAsync(subscriptionHistoryViewModel.Id);
-                if (subscriptionHistory.IsExtend == false)
-                {
-                    if (subscriptionHistory.EndDate <= _currentTime.GetCurrentTime())
-                    {
-                        subscriptionHistory.Status = false;
-                        _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
-                        await _unitOfWork.SaveChangeAsync();
-                    }
-                }
-                else
-                {
-                    var wallletTransaction = await _unitOfWork.WalletTransactionRepository.GetAllTransactionByUserId(userId);
-                    float pendingTransaction = wallletTransaction?.Where(item => item.Action == "Purchase pending").Sum(item => item.Amount) ?? 0;
-                    float cancleTransaction = wallletTransaction?.Where(item => item.Action == "Cancelled Pending").Sum(item => item.Amount) ?? 0;
-                    float deniedTransaction = wallletTransaction?.Where(item => item.Action == "Purchase denied").Sum(item => item.Amount) ?? 0;
-                    float completeTransaction = wallletTransaction?.Where(item => item.Action == "Purchase complete").Sum(_ => _.Amount) ?? 0;
-                    if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction + completeTransaction < subscription.Price)
-                    {
-                        WalletTransaction walletTransaction = new WalletTransaction()
-                        {
-                            TransactionType = "Extend subscription failed,user balance is not enough",
-                            WalletId = wallet.Id
-                        };
-                        subscriptionHistory.Status = false;
-                        _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
-                        _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
-                    }
-                    else
-                    {
-                        wallet.UserBalance = wallet.UserBalance - subscription.Price;
-                        WalletTransaction walletTransaction = new WalletTransaction()
-                        {
-                            TransactionType = "Extend subscription successfully",
-                            WalletId = wallet.Id,
-                            Amount = subscription.Price
-                        };
-                        subscriptionHistory.Status = true;
-                        subscriptionHistory.EndDate = subscriptionHistory.EndDate.AddDays(subscription.ExpiryDay);
-                        _unitOfWork.SubscriptionHistoryRepository.Update(subscriptionHistory);
-                        _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
-                        _unitOfWork.WalletRepository.Update(wallet);
-                        isExtended = await _unitOfWork.SaveChangeAsync() > 0;
-                        BackgroundJob.Schedule(() => (ExtendSubscriptionByUserId(userId)), TimeSpan.FromDays(subscription.ExpiryDay));
-                    }
-                }
-
-            }
-            if (!isExtended)
-            {
-                var checkDelete = await _postService.RemovePostWhenSubscriptionExpireByUserId(userId);
-                return checkDelete;
-            }
-            return isExtended;
-        }
+        
         public string GetPayemntUrl(int choice)
         {
             switch (choice)

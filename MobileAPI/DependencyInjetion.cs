@@ -1,4 +1,5 @@
 ﻿using Application.InterfaceService;
+using Application.IService;
 using Application.Service;
 using Application.Util;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -35,6 +36,7 @@ namespace MobileAPI
             services.AddScoped<IWalletTransactionService, WalletTransactionService>();
             services.AddMemoryCache();
             services.AddScoped<IPolicyService, PolicyService>();
+            services.AddScoped<IBackGroundService, BackGroundService>();
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {

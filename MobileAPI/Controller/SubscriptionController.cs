@@ -19,15 +19,5 @@ namespace MobileAPI.Controllers
             var listPlan=await _subscriptionService.GetAllSubscriptionAsync();
             return Ok(listPlan);
         }
-        [HttpPatch]
-        public async Task<IActionResult> ExtendSubscription()
-        {
-            var isUpdated = await _subscriptionService.ExtendSubscription();
-            if(isUpdated)
-            {
-                return Ok(isUpdated);
-            }
-            return BadRequest(isUpdated);
-        }
     }
 }

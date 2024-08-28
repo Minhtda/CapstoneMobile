@@ -202,7 +202,7 @@ namespace Infrastructure.Repository
             var prioritizedPosts = await _appDbContext.Posts
                 .Where(x => x.PostTitle.Contains(productName) && x.IsDelete == false && x.IsPriority == true)
                 .AsSplitQuery()
-                .OrderByDescending(p => p.CreationDate);
+                .OrderByDescending(p => p.CreationDate)
                  // Randomize
                 .Include(x => x.Product).ThenInclude(p => p.Category).AsSplitQuery()
                 .Include(x => x.Product).ThenInclude(p => p.ConditionType).AsSplitQuery()

@@ -11,6 +11,7 @@ using MobileAPI.Middleware;
 using Infrastructure;
 using Infrastructure.MapperConfig;
 using Microsoft.AspNetCore.Http.Connections;
+using Application.IService;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -122,7 +123,6 @@ app.MapHub<ChatHub>("/chatHub", options =>
 });
 //Call hangfire
 await app.StartAsync();
-RecurringJob.AddOrUpdate<ISubcriptionService>(sub => sub.ExtendSubscription(), "0 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-RecurringJob.AddOrUpdate<IPostService>(post => post.RemovePostWhenSubscriptionExpire(), "0 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-RecurringJob.AddOrUpdate<IPostService>(post => post.RemovePostDonationWhenOrderConfirm(), "0 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+RecurringJob.AddOrUpdate<IBackGroundService>(sub => sub.ExtendSubscription(), "0 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+RecurringJob.AddOrUpdate<IBackGroundService>(post => post.RemovePostWhenSubscriptionExpire(), "0 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
 await app.WaitForShutdownAsync();

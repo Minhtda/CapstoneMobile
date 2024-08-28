@@ -12,6 +12,5 @@ namespace Application.InterfaceService
         public string GetPayemntUrl(int choice);
         public Task<bool> HandleIpn(VnPayResponse vnPayResponse);
         public Task<bool> BuySubscription(Guid subscriptionId);
-        public Task<bool> ExtendSubscriptionByUserId(Guid userId);
     }
 }
