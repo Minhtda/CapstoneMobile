@@ -141,7 +141,8 @@ namespace Infrastructure.Repository
             // Randomize the prioritized posts (IsPriority == true)
             var prioritizedPosts = posts
                 .Where(p => p.IsPriority == true && p.CreatedBy != currentUserId)
-                ;
+                .OrderByDescending(p => p.CreationDate);
+            ;
 
             // Sort the non-prioritized posts (IsPriority is false or null) by CreationDate
             var nonPrioritizedPosts = posts
@@ -201,6 +202,7 @@ namespace Infrastructure.Repository
             var prioritizedPosts = await _appDbContext.Posts
                 .Where(x => x.PostTitle.Contains(productName) && x.IsDelete == false && x.IsPriority == true)
                 .AsSplitQuery()
+                .OrderByDescending(p => p.CreationDate);
                  // Randomize
                 .Include(x => x.Product).ThenInclude(p => p.Category).AsSplitQuery()
                 .Include(x => x.Product).ThenInclude(p => p.ConditionType).AsSplitQuery()
@@ -273,7 +275,7 @@ namespace Infrastructure.Repository
             // Randomize the prioritized posts (IsPriority == true)
             var prioritizedPosts = filteredPosts
                 .Where(p => p.IsPriority == true)
-                
+                .OrderByDescending(p => p.CreationDate)
                 .ToList();
 
             // Sort the non-prioritized posts (IsPriority is false or null) by CreationDate
