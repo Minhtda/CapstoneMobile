@@ -271,8 +271,17 @@ namespace Application.Service
                 
                 var accessToken = loginUser.GenerateTokenString(_appConfiguration!.JWTSecretKey, _currentTime.GetCurrentTime());
                 var refreshToken = RefreshToken.GetRefreshToken();
-               /* var key = loginUser.Id.ToString() + "_" + apiOrigin;*/
-                /*var cacheData = _cacheService.SetData<string>(key, refreshToken, _currentTime.GetCurrentTime().AddDays(2));*/
+
+                if (loginUser.Email.Contains("@fpt.edu.vn"))
+                {
+                    var verfiyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserId(loginUser.Id);
+                    if (verfiyUser != null)
+                    {
+                        verfiyUser.VerifyStatusId = 2;
+                        _unitOfWork.VerifyUsersRepository.Update(verfiyUser);
+                    }
+                    await _unitOfWork.SaveChangeAsync();
+                }
                 return new Token
                 {
                     userId=loginUser.Id,
