@@ -129,38 +129,16 @@ namespace Application.Service
             var findKey = user.Id.ToString() + "_" + apiOrigin;
             var accessToken = user.GenerateTokenString(_appConfiguration!.JWTSecretKey, _currentTime.GetCurrentTime());
             var refreshToken = RefreshToken.GetRefreshToken();
-            /*var key = user.Id.ToString() + "_" + apiOrigin;*/
-            /*var accessTokenKey = user.Id.ToString() + "_" + "accesstoken";*/
-         /*   var cacheData = _cacheService.SetData<string>(key, refreshToken, _currentTime.GetCurrentTime().AddDays(2));
-            var accessTokeData = _cacheService.SetData<string>(accessTokenKey, accessToken, _currentTime.GetCurrentTime().AddDays(2));*/
-          /*  Wallet findUserWallet = null;
-            VerifyUser checkVerifyUser = null;*/
-          /*  if (user.RoleId == 3)
+            if (user.Email.Contains("@fpt.edu.vn"))
             {
-                findUserWallet = await _unitOfWork.WalletRepository.FindWalletByUserId(user.Id);
-                checkVerifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserId(user.Id);
-            }*/
-           
-         /*   user.ProfileImage = "https://firebasestorage.googleapis.com/v0/b/firestorage-4ee45.appspot.com/o/Product%2Favatar-trang-4.jpg?alt=media&token=b5970145-10b1-4adf-b04a-2b73b9aa6088";
-            _unitOfWork.UserRepository.Update(user);*/
-          /*  await _unitOfWork.SaveChangeAsync();*/
-            /*if (user.RoleId == 3)
-            {
-                if (findUserWallet == null)
+                var verfiyUser=await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserId(user.Id);
+                if(verfiyUser != null)
                 {
-                    var walletId = await CreateWallet(user.Id);
-                    user.WalletId = walletId;
-                    _unitOfWork.UserRepository.Update(user);
-                    await _unitOfWork.SaveChangeAsync();
+                    verfiyUser.VerifyStatusId = 2;
+                    _unitOfWork.VerifyUsersRepository.Update(verfiyUser);
                 }
-                if (checkVerifyUser == null)
-                {
-                    var verfiyUserId = await CreateVerifyUser(user.Id);
-                    user.VerifyUserId = verfiyUserId;
-                    _unitOfWork.UserRepository.Update(user);
-                    await _unitOfWork.SaveChangeAsync();
-                }
-            }*/
+                await _unitOfWork.SaveChangeAsync();
+            }
             return new Token
             {
                 userId=user.Id,
@@ -293,8 +271,17 @@ namespace Application.Service
                 
                 var accessToken = loginUser.GenerateTokenString(_appConfiguration!.JWTSecretKey, _currentTime.GetCurrentTime());
                 var refreshToken = RefreshToken.GetRefreshToken();
-               /* var key = loginUser.Id.ToString() + "_" + apiOrigin;*/
-                /*var cacheData = _cacheService.SetData<string>(key, refreshToken, _currentTime.GetCurrentTime().AddDays(2));*/
+
+                if (loginUser.Email.Contains("@fpt.edu.vn"))
+                {
+                    var verfiyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserId(loginUser.Id);
+                    if (verfiyUser != null)
+                    {
+                        verfiyUser.VerifyStatusId = 2;
+                        _unitOfWork.VerifyUsersRepository.Update(verfiyUser);
+                    }
+                    await _unitOfWork.SaveChangeAsync();
+                }
                 return new Token
                 {
                     userId=loginUser.Id,
