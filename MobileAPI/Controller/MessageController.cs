@@ -95,5 +95,12 @@ namespace MobileAPI.Controllers
             }
             return Ok();
         }
+        [Authorize]
+        [HttpGet("{roomId}")]
+        public async Task<IActionResult> GetListPostAndUserInfo(Guid roomId)
+        {
+            var result = await _postService.GetPostAndUserInfoByChatroomId(roomId);
+            return Ok(result);
+        }
     }
 }

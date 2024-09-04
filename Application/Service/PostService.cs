@@ -7,6 +7,8 @@ using Application.ViewModel.WishListModel;
 using AutoMapper;
 using Domain.Entities;
 using Hangfire;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -434,6 +436,25 @@ namespace Application.Service
                 }
             }
             return isDeleted;
+        }
+        public async Task<PostWithQuantityAndBuyerInfoModel> GetPostAndUserInfoByChatroomId(Guid chatRoomid)
+        {
+            var chatRoom = await _unitOfWork.ChatRoomRepository.GetByIdAsync(chatRoomid);
+            var buyerId = new Guid();
+            var sellerId = _claimService.GetCurrentUserId;
+            if (sellerId == chatRoom.ReceiverId)
+            {
+                buyerId = chatRoom.SenderId;
+            }
+            else
+            {
+                buyerId = chatRoom.ReceiverId;
+            }
+            var result = new PostWithQuantityAndBuyerInfoModel();
+            var posts = await _unitOfWork.PostRepository.GetAllPostsByCreatedByIdAsync(sellerId);
+            result.listPost = _mapper.Map<List<PostViewModel>>(posts);
+            result.buyerInfo = await _unitOfWork.UserRepository.GetUserDetail(buyerId);
+            return result;
         }
     }
 }
