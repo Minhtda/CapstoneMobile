@@ -356,6 +356,52 @@ namespace Infrastructure.Repository
                                    .Take(3) // Take 3 random posts
                                    .ToListAsync();
         }
+        public async Task<List<PostDetailMaxQuantityViewModel>> GetPostDetailWithMaxQuantityByUserId(Guid userId)
+        {
+            var postDetail = await _appDbContext.Posts.Where(x=> x.CreatedBy == userId && x.IsDelete == false)
+                                                      .Include(x => x.Product)
+                                                      .ThenInclude(x => x.Category)
+                                                      .AsSplitQuery()
+                                                      .Include(x => x.Product)
+                                                      .ThenInclude(x => x.ConditionType)
+                                                      .AsSplitQuery()
+                                                      .Include(x => x.Requests)
+                                                      .ThenInclude(x => x.OrderStatusId)
+                                                      .Select(x => new PostDetailMaxQuantityViewModel
+                                                      {
+
+                                                          PostId = x.Id,
+                                                          PostContent = x.PostContent,
+                                                          PostTitle = x.PostTitle,
+                                                          ProductImageUrl = x.Product.ProductImageUrl,
+                                                          ProductPrice = x.Product.ProductPrice,
+                                                          MaxQuantity = x.Product.ProductQuantity.Value
+                                                          /*- x.Requests
+                                                                    .Where(o => o.OrderStatusId == 2 || o.OrderStatusId == 3)
+                                                                    .Sum(o => (int?)o.quantity ?? 0)*/,
+                                                          CategoryId = x.Product.CategoryId.Value,
+                                                          CategoryName = x.Product.Category.CategoryName,
+                                                          ConditionTypeId = x.Product.ConditionId.Value,
+                                                          ConditionTypeName = x.Product.ConditionType.ConditionType,
+                                                          ProductStatus = x.Product.ProductStatus,
+                                                          RequestedProduct = x.Product.RequestedProduct,
+                                                          PostAuthor = _appDbContext.Users.Where(user => user.Id == x.CreatedBy).Include(user => user.RatedUsers).AsSplitQuery().Select(postAuthor => new PostAuthor
+                                                          {
+                                                              AuthorId = x.CreatedBy.Value,
+                                                              CreatedDate = x.CreationDate.HasValue ? DateOnly.FromDateTime(x.CreationDate.Value) : null,
+                                                              FulName = postAuthor.FirstName + "" + postAuthor.LastName,
+                                                              Email = postAuthor.Email,
+                                                              PhoneNumber = postAuthor.PhoneNumber,
+                                                              HomeAddress = postAuthor.HomeAddress,
+                                                              Rating = (postAuthor.RatedUsers.Count() > 0
+                                                              ? postAuthor.RatedUsers.Sum(r => r.RatingPoint) / (postAuthor.RatedUsers.Count())
+                                                              : 0),
+                                                              AuthorImage = postAuthor.ProfileImage
+                                                          }).Single()
+                                                      }).ToListAsync();
+            return postDetail;
+
+        }
     }
 }
 

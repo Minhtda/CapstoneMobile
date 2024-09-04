@@ -451,8 +451,8 @@ namespace Application.Service
                 buyerId = chatRoom.ReceiverId;
             }
             var result = new PostWithQuantityAndBuyerInfoModel();
-            var posts = await _unitOfWork.PostRepository.GetAllPostsByCreatedByIdAsync(sellerId);
-            result.listPost = _mapper.Map<List<PostViewModel>>(posts);
+            var posts = await _unitOfWork.PostRepository.GetPostDetailWithMaxQuantityByUserId(sellerId);
+            result.listPost = posts;
             result.buyerInfo = await _unitOfWork.UserRepository.GetUserDetail(buyerId);
             return result;
         }
