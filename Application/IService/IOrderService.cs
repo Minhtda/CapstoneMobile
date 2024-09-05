@@ -12,10 +12,10 @@ namespace Application.InterfaceService
     {
         Task<List<ReceiveOrderViewModel>> GetAllOrdersOfCurrentUserAsync();
         Task<List<SentOrderViewModel>> GetAllOrdersOfCreatebByUserAsync();
-        Task<bool> AcceptOrder(Guid OrderId);
+        Task<bool> CheckOrder(Guid OrderId);
         Task<bool> CheckOrderStatusByPostId(Guid postId); 
         Task<ReceiveOrderViewModel> GetOrderDetailAsync(Guid postId);
-        Task<bool> DeliveredOrder(Guid orderId);
+        Task<bool> ReceivedOrder(Guid orderId);
         Task<bool> CancleOrder(Guid orderId);
         Task<bool> ConfirmOrder(Guid orderId);
         Task<bool> CancleOrderForAdmin(Guid orderId);
@@ -26,5 +26,6 @@ namespace Application.InterfaceService
         Task<List<ReceiveOrderViewModel>> GetReceiveOrderByChatRoomId(Guid chatRoomId);
         Task<List<OrderViewModelForWeb>> GetAllOrderForWebAsync();
         Task<bool> ChangeOrderStatus(Guid orderId, int oldOrderStatusId);
+        Task<bool> CreateOrder(CreateOrderModel createOrderModel);
     }
 }
