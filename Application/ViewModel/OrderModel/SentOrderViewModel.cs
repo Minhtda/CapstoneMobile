@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Application.ViewModel.OrderModel
 {
-    public class SentOrderViewModel { 
+    public class SentOrderViewModel 
+    { 
     
         public Guid OrderId { get; set; }
-        public string OrderMessage { get; set; }
         public string OrderStatus { get; set; }
         public DateTime? CreationDate { get; set; }
         public PostViewModelForOrder Post { get; set; }

@@ -47,7 +47,7 @@ namespace Application.Service
             // Update the Order status
             order.OrderStatusId = _accept;
             var jobId = BackgroundJob.Schedule(() => (ChangeOrderStatus(OrderId, _accept)), TimeSpan.FromHours(12));
-            order.OrderMessage = jobId;
+            order.BackgroundId = jobId;
             _unitOfWork.OrderRepository.Update(order);
             return await _unitOfWork.SaveChangeAsync()>0;
         }
@@ -66,12 +66,12 @@ namespace Application.Service
             }
             // Update the Order status
             Order.OrderStatusId = _delivered;
-            if (Order.OrderMessage != null)
+            if (Order.BackgroundId != null)
             {
-                BackgroundJob.Delete(Order.OrderMessage);
+                BackgroundJob.Delete(Order.BackgroundId);
             }
             var jobId = BackgroundJob.Schedule(() => (ChangeOrderStatus(orderId, _delivered)), TimeSpan.FromHours(12));
-            Order.OrderMessage = jobId;
+            Order.BackgroundId = jobId;
             _unitOfWork.OrderRepository.Update(Order);
             // Save all changes
             return await _unitOfWork.SaveChangeAsync() > 0;
@@ -156,9 +156,9 @@ namespace Application.Service
                 throw new Exception("Order is not delivered.");
             }
             order.OrderStatusId = _confirm;
-            if (order.OrderMessage != null)
+            if (order.BackgroundId != null)
             {
-                BackgroundJob.Delete(order.OrderMessage);
+                BackgroundJob.Delete(order.BackgroundId);
             }
             _unitOfWork.OrderRepository.Update(order);
             var post = await _unitOfWork.PostRepository.GetPostDetail(order.PostId);
@@ -227,9 +227,9 @@ namespace Application.Service
             }
             var orderStatus = order.OrderStatusId;
             order.OrderStatusId = _cancel;
-            if (order.OrderMessage != null)
+            if (order.BackgroundId != null)
             {
-                BackgroundJob.Delete(order.OrderMessage);
+                BackgroundJob.Delete(order.BackgroundId);
             }
             _unitOfWork.OrderRepository.Update(order);
             var walletTransaction = await _unitOfWork.WalletTransactionRepository.GetByOrderIdAsync(orderId);
