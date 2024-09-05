@@ -9,7 +9,7 @@ namespace Application.ViewModel.OrderModel
     public class CreateOrderModel
     {
         public Guid PostId { get; set; }
-        public string OrderMessage { get; set; }
-        public Guid AuthorId { get; set; }
+        public Guid BuyerId { get; set; }
+        public int Quantity { get; set; }
     }
 }
