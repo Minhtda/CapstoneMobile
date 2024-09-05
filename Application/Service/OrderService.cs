@@ -373,7 +373,7 @@ namespace Application.Service
             }
             var productId = await _unitOfWork.PostRepository.GetProductIdFromPostId(createOrderModel.PostId);
             var product = await _unitOfWork.ProductRepository.GetByIdAsync(productId);
-            if (product.ProductQuantity - checkOrders.Where(o => o.OrderStatusId == _checked || o.OrderStatusId == _received).Sum(o => (int?)o.OrderQuantity ?? 0) < createOrderModel.Quantity)
+            if (product.ProductQuantity - checkOrders.Where(o => o.OrderStatusId == _accept || o.OrderStatusId == _received).Sum(o => (int?)o.OrderQuantity ?? 0) < createOrderModel.Quantity)
             {
                 throw new Exception("This post don't have enough quantity");
             }
