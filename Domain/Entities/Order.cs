@@ -10,6 +10,7 @@ namespace Domain.Entities
     {
         public string OrderMessage { get; set; }
         public int OrderStatusId { get; set; }
+        public int OrderQuantity { get; set; }
         public OrderStatus Status { get; set; }
         public Guid UserId { get; set; }
         public User User { get; set; }
