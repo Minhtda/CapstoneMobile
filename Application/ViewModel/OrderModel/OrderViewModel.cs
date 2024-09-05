@@ -11,7 +11,6 @@ namespace Application.ViewModel.OrderModel
     public class ReceiveOrderViewModel
     {
         public Guid OrderId { get; set; }
-        public string OrderMessage { get; set; }
         public string OrderStatus { get; set; }
         public DateTime? CreationDate { get; set; }
         public PostViewModelForOrder Post { get; set; }

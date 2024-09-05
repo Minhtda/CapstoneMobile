@@ -120,7 +120,7 @@ namespace Infrastructure.MapperConfig
         {
             CreateMap<CreateOrderModel, Order>()
                 .ForMember(dest => dest.PostId, opt => opt.MapFrom(model => model.PostId))
-                .ForMember(dest => dest.UserId, opt => opt.MapFrom(model => model.AuthorId))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(model => model.BuyerId))
                 .ReverseMap();
         }
         internal void CategoryMap()

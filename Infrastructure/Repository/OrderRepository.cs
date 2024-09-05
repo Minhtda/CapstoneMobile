@@ -37,7 +37,6 @@ namespace Infrastructure.Repository
                                             .Select(x => new ReceiveOrderViewModel
                                             {
                                                 OrderId = x.Id,
-                                                OrderMessage = x.OrderMessage,
                                                 OrderStatus = x.Status.StatusName,
                                                 CreationDate = x.CreationDate,
                                                 Post = new PostViewModelForOrder
@@ -70,7 +69,6 @@ namespace Infrastructure.Repository
                                             .Select(x => new SentOrderViewModel
                                             {
                                                 OrderId = x.Id,
-                                                OrderMessage = x.OrderMessage,
                                                 OrderStatus=x.Status.StatusName,
                                                 CreationDate = x.CreationDate,
                                                 Post = new PostViewModelForOrder
@@ -140,7 +138,6 @@ namespace Infrastructure.Repository
                                              .Select(x => new ReceiveOrderViewModel
                                              {
                                                  OrderId = x.Id,
-                                                 OrderMessage = x.OrderMessage,
                                                  OrderStatus=x.Status.StatusName,
                                                  CreationDate = x.CreationDate,
                                                  Post = new PostViewModelForOrder
@@ -186,7 +183,6 @@ namespace Infrastructure.Repository
                                               .Select(x => new ReceiveOrderViewModel
                                               {
                                                   OrderId=orderId,
-                                                  OrderMessage=x.OrderMessage,
                                                   OrderStatus=x.Status.StatusName,
                                                   CreationDate=x.CreationDate,
                                                   Post=new PostViewModelForOrder
@@ -245,7 +241,6 @@ namespace Infrastructure.Repository
                                              .Select(x => new ReceiveOrderViewModel
                                              {
                                                  OrderId = x.Id,
-                                                 OrderMessage = x.OrderMessage,
                                                  OrderStatus = x.Status.StatusName,
                                                  CreationDate = x.CreationDate,
                                                  Post = new PostViewModelForOrder
@@ -294,7 +289,6 @@ namespace Infrastructure.Repository
                                              .Select(x => new ReceiveOrderViewModel
                                              {
                                                  OrderId = x.Id,
-                                                 OrderMessage = x.OrderMessage,
                                                  OrderStatus = x.Status.StatusName,
                                                  CreationDate = x.CreationDate,
                                                  Post = new PostViewModelForOrder
@@ -343,7 +337,6 @@ namespace Infrastructure.Repository
                                              .Select(x => new ReceiveOrderViewModel
                                              {
                                                  OrderId = x.Id,
-                                                 OrderMessage = x.OrderMessage,
                                                  OrderStatus = x.Status.StatusName,
                                                  CreationDate = x.CreationDate,
                                                  Post = new PostViewModelForOrder
@@ -392,7 +385,6 @@ namespace Infrastructure.Repository
                                              .Select(x => new SentOrderViewModel
                                              {
                                                  OrderId = x.Id,
-                                                 OrderMessage = x.OrderMessage,
                                                  OrderStatus = x.Status.StatusName,
                                                  CreationDate = x.CreationDate,
                                                  Post = new PostViewModelForOrder
@@ -438,7 +430,6 @@ namespace Infrastructure.Repository
                                             .Select(x => new OrderViewModelForWeb
                                             {
                                                 Id = x.Id,
-                                                OrderMessage = x.OrderMessage,
                                                 OrderStatus = x.Status.StatusName,
                                                 CreationDate = x.CreationDate,
                                                 Post = new PostViewModelForOrder

@@ -40,10 +40,10 @@ namespace MobileAPI.Controllers
         }
         [Authorize]
         [HttpPut]
-        public async Task<IActionResult> AcceptOrder(Guid orderId)
+        public async Task<IActionResult> CheckedOrder(Guid orderId)
         {
            
-                var isAccepted = await _orderService.AcceptOrder(orderId);
+                var isAccepted = await _orderService.CheckOrder(orderId);
                 if (isAccepted)
                 {
                     return Ok();
@@ -64,10 +64,10 @@ namespace MobileAPI.Controllers
         }
         [Authorize]
         [HttpPut()]
-        public async Task<IActionResult> UpdateDeliveredOrder(Guid orderId)
+        public async Task<IActionResult> UpdateReceivedOrder(Guid orderId)
         {
            
-                var isAccepted = await _orderService.DeliveredOrder(orderId);
+                var isAccepted = await _orderService.ReceivedOrder(orderId);
                 if (isAccepted)
                 {
                     return Ok();
