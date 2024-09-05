@@ -39,6 +39,8 @@ namespace Infrastructure.Repository
                                                 OrderId = x.Id,
                                                 OrderStatus = x.Status.StatusName,
                                                 CreationDate = x.CreationDate,
+                                                ShippingFee = x.ShippingFee,
+                                                Quantity = x.OrderQuantity,
                                                 Post = new PostViewModelForOrder
                                                 {
                                                     PostId = x.PostId,
@@ -71,6 +73,8 @@ namespace Infrastructure.Repository
                                                 OrderId = x.Id,
                                                 OrderStatus=x.Status.StatusName,
                                                 CreationDate = x.CreationDate,
+                                                ShippingFee = x.ShippingFee,
+                                                Quantity = x.OrderQuantity,
                                                 Post = new PostViewModelForOrder
                                                 {
                                                     PostId = x.PostId,
@@ -140,6 +144,8 @@ namespace Infrastructure.Repository
                                                  OrderId = x.Id,
                                                  OrderStatus=x.Status.StatusName,
                                                  CreationDate = x.CreationDate,
+                                                 ShippingFee = x.ShippingFee,
+                                                 Quantity = x.OrderQuantity,
                                                  Post = new PostViewModelForOrder
                                                  {
                                                      PostId = x.PostId,
@@ -185,7 +191,9 @@ namespace Infrastructure.Repository
                                                   OrderId=orderId,
                                                   OrderStatus=x.Status.StatusName,
                                                   CreationDate=x.CreationDate,
-                                                  Post=new PostViewModelForOrder
+                                                  ShippingFee = x.ShippingFee,
+                                                  Quantity = x.OrderQuantity,
+                                                  Post =new PostViewModelForOrder
                                                   {
                                                       PostId=x.PostId,
                                                       PostContent=x.Post.PostContent,
@@ -243,6 +251,8 @@ namespace Infrastructure.Repository
                                                  OrderId = x.Id,
                                                  OrderStatus = x.Status.StatusName,
                                                  CreationDate = x.CreationDate,
+                                                 ShippingFee = x.ShippingFee,
+                                                 Quantity = x.OrderQuantity,
                                                  Post = new PostViewModelForOrder
                                                  {
                                                      PostId = x.PostId,
@@ -291,6 +301,8 @@ namespace Infrastructure.Repository
                                                  OrderId = x.Id,
                                                  OrderStatus = x.Status.StatusName,
                                                  CreationDate = x.CreationDate,
+                                                 ShippingFee = x.ShippingFee,
+                                                 Quantity = x.OrderQuantity,
                                                  Post = new PostViewModelForOrder
                                                  {
                                                      PostId = x.PostId,
@@ -339,6 +351,8 @@ namespace Infrastructure.Repository
                                                  OrderId = x.Id,
                                                  OrderStatus = x.Status.StatusName,
                                                  CreationDate = x.CreationDate,
+                                                 ShippingFee = x.ShippingFee,
+                                                 Quantity = x.OrderQuantity,
                                                  Post = new PostViewModelForOrder
                                                  {
                                                      PostId = x.PostId,
@@ -387,6 +401,8 @@ namespace Infrastructure.Repository
                                                  OrderId = x.Id,
                                                  OrderStatus = x.Status.StatusName,
                                                  CreationDate = x.CreationDate,
+                                                 ShippingFee = x.ShippingFee,
+                                                 Quantity = x.OrderQuantity,
                                                  Post = new PostViewModelForOrder
                                                  {
                                                      PostId = x.PostId,
@@ -432,6 +448,8 @@ namespace Infrastructure.Repository
                                                 Id = x.Id,
                                                 OrderStatus = x.Status.StatusName,
                                                 CreationDate = x.CreationDate,
+                                                ShippingFee = x.ShippingFee,
+                                                Quantity = x.OrderQuantity,
                                                 Post = new PostViewModelForOrder
                                                 {
                                                     PostId = x.PostId,

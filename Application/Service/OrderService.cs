@@ -21,7 +21,7 @@ namespace Application.Service
         private readonly IClaimService _claimService;
         private readonly IMapper _mapper;
         private readonly int _pending = 1;
-        private readonly int _checked = 2;
+        private readonly int _accept = 2;
         private readonly int _reject = 3;
         private readonly int _cancel = 4;
         private readonly int _confirm = 5;
@@ -63,8 +63,8 @@ namespace Application.Service
                 await _unitOfWork.WalletTransactionRepository.AddAsync(newWalletTransaction);
                 await _unitOfWork.SaveChangeAsync();
             }
-            order.OrderStatusId = _checked;
-            var jobId = BackgroundJob.Schedule(() => (ChangeOrderStatus(OrderId, _checked)), TimeSpan.FromHours(12));
+            order.OrderStatusId = _accept;
+            var jobId = BackgroundJob.Schedule(() => (ChangeOrderStatus(OrderId, _accept)), TimeSpan.FromHours(12));
             order.BackgroundId = jobId;
             _unitOfWork.OrderRepository.Update(order);
             return await _unitOfWork.SaveChangeAsync()>0;
@@ -78,7 +78,7 @@ namespace Application.Service
                 throw new Exception("Order is not found");
             }
 
-            if (Order.OrderStatusId != _checked)
+            if (Order.OrderStatusId != _accept)
             {
                 throw new Exception("Order is not accepted");
             }
@@ -107,7 +107,7 @@ namespace Application.Service
             var OrderList = await _unitOfWork.OrderRepository.GetOrderByPostId(postId);
             foreach(var order in OrderList)
             {
-                if (order.OrderStatusId == _checked || order.OrderStatusId == _confirm || order.OrderStatusId == _received)
+                if (order.OrderStatusId == _accept || order.OrderStatusId == _confirm || order.OrderStatusId == _received)
                 {
                     return true;
                 }
@@ -383,7 +383,8 @@ namespace Application.Service
                 UserId = createOrderModel.BuyerId,
                 OrderQuantity = createOrderModel.Quantity,
                 OrderStatusId = _pending,
-                BackgroundId = ""
+                BackgroundId = "",
+                ShippingFee = createOrderModel.ShippingFee,
             };
             await _unitOfWork.OrderRepository.AddAsync(order);
             return await _unitOfWork.SaveChangeAsync()>0;
