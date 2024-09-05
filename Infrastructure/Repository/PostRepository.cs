@@ -366,7 +366,6 @@ namespace Infrastructure.Repository
                                                       .ThenInclude(x => x.ConditionType)
                                                       .AsSplitQuery()
                                                       .Include(x => x.Requests)
-                                                      .ThenInclude(x => x.OrderStatusId)
                                                       .Select(x => new PostDetailMaxQuantityViewModel
                                                       {
 

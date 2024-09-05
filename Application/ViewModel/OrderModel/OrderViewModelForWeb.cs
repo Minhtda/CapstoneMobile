@@ -13,6 +13,8 @@ namespace Application.ViewModel.OrderModel
         public Guid Id { get; set; }
         public string OrderStatus { get; set; }
         public DateTime? CreationDate { get; set; }
+        public float ShippingFee { get; set; }
+        public int Quantity { get; set; }
         public PostViewModelForOrder Post { get; set; }
         public UserViewModelForOrder User { get; set; }
     }

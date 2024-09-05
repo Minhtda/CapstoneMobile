@@ -11,5 +11,6 @@ namespace Application.ViewModel.OrderModel
         public Guid PostId { get; set; }
         public Guid BuyerId { get; set; }
         public int Quantity { get; set; }
+        public float ShippingFee { get; set; }
     }
 }
