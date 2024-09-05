@@ -376,9 +376,9 @@ namespace Infrastructure.Repository
                                                           ProductImageUrl = x.Product.ProductImageUrl,
                                                           ProductPrice = x.Product.ProductPrice,
                                                           MaxQuantity = x.Product.ProductQuantity.Value
-                                                          /*- x.Requests
-                                                                    .Where(o => o.OrderStatusId == 2 || o.OrderStatusId == 3)
-                                                                    .Sum(o => (int?)o.quantity ?? 0)*/,
+                                                          - x.Requests
+                                                                    .Where(o => o.OrderStatusId == 2 || o.OrderStatusId == 6)
+                                                                    .Sum(o => (int?)o.OrderQuantity ?? 0),
                                                           CategoryId = x.Product.CategoryId.Value,
                                                           CategoryName = x.Product.Category.CategoryName,
                                                           ConditionTypeId = x.Product.ConditionId.Value,
