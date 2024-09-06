@@ -460,7 +460,7 @@ namespace Application.Service
         public async Task<List<PostViewModel>> GetRecommendPostListAsync()
         {
             var wishList = await _unitOfWork.WishListRepository.FindWishListByUserId(_claimService.GetCurrentUserId);
-            if(wishList == null)
+            if(wishList.Count()==0)
             {
                 return await _unitOfWork.PostRepository.GetRandomPost(_claimService.GetCurrentUserId);
             }

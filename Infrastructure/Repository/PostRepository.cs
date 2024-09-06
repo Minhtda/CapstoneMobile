@@ -478,7 +478,7 @@ namespace Infrastructure.Repository
         {
             List<PostViewModel> posts = new List<PostViewModel>();
             var wishListPost = await _appDbContext.WishLists.Where(x => x.UserId == userId&&x.IsDelete==false).Select(x=>x.Post.Product.Category.CategoryName).ToListAsync();
-            if (wishListPost == null)
+            if (wishListPost.Count()==0)
             {
                 return null;
             }
@@ -507,7 +507,7 @@ namespace Infrastructure.Repository
                                                          RequestedProduct = x.Product.RequestedProduct
                                                      }
                                                  })
-                                                .Take(1).ToListAsync();
+                                                .Take(2).ToListAsync();
             }
             return posts;
         }
