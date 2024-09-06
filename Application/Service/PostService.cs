@@ -456,5 +456,15 @@ namespace Application.Service
             result.buyerInfo = await _unitOfWork.UserRepository.GetUserDetail(buyerId);
             return result;
         }
+
+        public async Task<List<PostViewModel>> GetRecommendPostListAsync()
+        {
+            var wishList = await _unitOfWork.WishListRepository.FindWishListByUserId(_claimService.GetCurrentUserId);
+            if(wishList == null)
+            {
+                return await _unitOfWork.PostRepository.GetRandomPost(_claimService.GetCurrentUserId);
+            }
+            return await _unitOfWork.PostRepository.GetRecommendPostByWishlist(_claimService.GetCurrentUserId);
+        }
     }
 }

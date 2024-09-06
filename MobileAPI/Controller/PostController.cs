@@ -248,5 +248,12 @@ namespace MobileAPI.Controllers
               }
               return BadRequest();
           }*/
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> RecommendPost()
+        {
+            var recommendListPost=await _postService.GetRecommendPostListAsync();
+            return Ok(recommendListPost);
+        }
     }
 }

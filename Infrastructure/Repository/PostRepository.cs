@@ -37,7 +37,7 @@ namespace Infrastructure.Repository
                     .ThenInclude(p => p.Category)
                 .Include(x => x.Product)
                     .ThenInclude(p => p.ConditionType)
-                .Include(x=>x.Author)
+                .Include(x => x.Author)
                 .Select(x => new PostViewModel
                 {
                     PostId = x.Id,
@@ -45,7 +45,7 @@ namespace Infrastructure.Repository
                     PostTitle = x.PostTitle,
                     CreationDate = DateOnly.FromDateTime(x.CreationDate.Value),
                     AuthorId = x.UserId,
-                    Location=x.Author.HomeAddress,
+                    Location = x.Author.HomeAddress,
                     Product = new ProductModel
                     {
                         ProductId = x.ProductId,
@@ -158,43 +158,43 @@ namespace Infrastructure.Repository
         public async Task<PostDetailViewModel> GetPostDetail(Guid postId)
         {
             var postDetail = await _appDbContext.Posts.Where(x => x.Id == postId && x.IsDelete == false)
-                                                      .Include(x=>x.Product)
-                                                      .ThenInclude(x=>x.Category)
+                                                      .Include(x => x.Product)
+                                                      .ThenInclude(x => x.Category)
                                                       .AsSplitQuery()
-                                                      .Include(x=>x.Product)
-                                                      .ThenInclude(x=>x.ConditionType)
+                                                      .Include(x => x.Product)
+                                                      .ThenInclude(x => x.ConditionType)
                                                       .AsSplitQuery()
                                                       .Select(x => new PostDetailViewModel
-            {
+                                                      {
 
-                PostId = x.Id,
-                PostContent = x.PostContent,
-                PostTitle = x.PostTitle,
-                ProductImageUrl = x.Product.ProductImageUrl,
-                ProductPrice = x.Product.ProductPrice,
-                ProductQuantity = x.Product.ProductQuantity.Value,
-                CategoryId = x.Product.CategoryId.Value,
-                CategoryName = x.Product.Category.CategoryName,
-                ConditionTypeId = x.Product.ConditionId.Value,
-                ConditionTypeName = x.Product.ConditionType.ConditionType,
-                ProductStatus = x.Product.ProductStatus,
-                RequestedProduct = x.Product.RequestedProduct,
-                PostAuthor = _appDbContext.Users.Where(user => user.Id == x.CreatedBy).Include(user=>user.RatedUsers).AsSplitQuery().Select(postAuthor => new PostAuthor
-                {
-                    AuthorId = x.CreatedBy.Value,
-                    CreatedDate = x.CreationDate.HasValue ? DateOnly.FromDateTime(x.CreationDate.Value) : null,
-                    FulName = postAuthor.FirstName + "" + postAuthor.LastName,
-                    Email = postAuthor.Email,
-                    PhoneNumber = postAuthor.PhoneNumber,
-                    HomeAddress = postAuthor.HomeAddress,
-                    Rating = (postAuthor.RatedUsers.Count() > 0
-                    ? postAuthor.RatedUsers.Sum(r => r.RatingPoint) / (postAuthor.RatedUsers.Count())
-                    : 0),
-                    AuthorImage = postAuthor.ProfileImage
-                }).Single()
-            }).SingleOrDefaultAsync();
+                                                          PostId = x.Id,
+                                                          PostContent = x.PostContent,
+                                                          PostTitle = x.PostTitle,
+                                                          ProductImageUrl = x.Product.ProductImageUrl,
+                                                          ProductPrice = x.Product.ProductPrice,
+                                                          ProductQuantity = x.Product.ProductQuantity.Value,
+                                                          CategoryId = x.Product.CategoryId.Value,
+                                                          CategoryName = x.Product.Category.CategoryName,
+                                                          ConditionTypeId = x.Product.ConditionId.Value,
+                                                          ConditionTypeName = x.Product.ConditionType.ConditionType,
+                                                          ProductStatus = x.Product.ProductStatus,
+                                                          RequestedProduct = x.Product.RequestedProduct,
+                                                          PostAuthor = _appDbContext.Users.Where(user => user.Id == x.CreatedBy).Include(user => user.RatedUsers).AsSplitQuery().Select(postAuthor => new PostAuthor
+                                                          {
+                                                              AuthorId = x.CreatedBy.Value,
+                                                              CreatedDate = x.CreationDate.HasValue ? DateOnly.FromDateTime(x.CreationDate.Value) : null,
+                                                              FulName = postAuthor.FirstName + "" + postAuthor.LastName,
+                                                              Email = postAuthor.Email,
+                                                              PhoneNumber = postAuthor.PhoneNumber,
+                                                              HomeAddress = postAuthor.HomeAddress,
+                                                              Rating = (postAuthor.RatedUsers.Count() > 0
+                                                              ? postAuthor.RatedUsers.Sum(r => r.RatingPoint) / (postAuthor.RatedUsers.Count())
+                                                              : 0),
+                                                              AuthorImage = postAuthor.ProfileImage
+                                                          }).Single()
+                                                      }).SingleOrDefaultAsync();
             return postDetail;
-       
+
         }
 
         public async Task<List<PostViewModel>> SearchPostByProductName(string productName)
@@ -204,7 +204,7 @@ namespace Infrastructure.Repository
                 .Where(x => x.PostTitle.Contains(productName) && x.IsDelete == false && x.IsPriority == true)
                 .AsSplitQuery()
                 .OrderByDescending(p => p.CreationDate)
-                 // Randomize
+                // Randomize
                 .Include(x => x.Product).ThenInclude(p => p.Category).AsSplitQuery()
                 .Include(x => x.Product).ThenInclude(p => p.ConditionType).AsSplitQuery()
                 .Select(x => new PostViewModel
@@ -271,7 +271,7 @@ namespace Infrastructure.Repository
                 p => p.Product.ConditionType);
 
             // Filter the posts by the given category ID
-            var filteredPosts = listPost.Where(p => p.Product.Category.CategoryId == categoryId&&p.UserId!=userId);
+            var filteredPosts = listPost.Where(p => p.Product.Category.CategoryId == categoryId && p.UserId != userId);
 
             // Randomize the prioritized posts (IsPriority == true)
             var prioritizedPosts = filteredPosts
@@ -311,11 +311,11 @@ namespace Infrastructure.Repository
                                            .AsSplitQuery()
                                            .Select(x => new PostViewModelForWeb
                                            {
-                                               Id=x.Id,
-                                               PostContent=x.PostContent,
-                                               PostTitle=x.PostTitle,
-                                               CreationDate=DateOnly.FromDateTime(x.CreationDate.Value),
-                                               Status= x.IsDelete.Value? "Ban":"Unban"
+                                               Id = x.Id,
+                                               PostContent = x.PostContent,
+                                               PostTitle = x.PostTitle,
+                                               CreationDate = DateOnly.FromDateTime(x.CreationDate.Value),
+                                               Status = x.IsDelete.Value ? "Ban" : "Unban"
                                            }).AsQueryable().AsNoTracking().ToListAsync();
         }
 
@@ -335,7 +335,7 @@ namespace Infrastructure.Repository
                 return await _appDbContext.Posts.Where(x => x.IsDelete == false)
                                    .Include(x => x.Product)
                                    .AsSplitQuery()
-                                    // Random order
+                                   // Random order
                                    .Select(x => new PostViewModelForFeaturedImage
                                    {
                                        PostId = x.Id,
@@ -358,7 +358,7 @@ namespace Infrastructure.Repository
         }
         public async Task<List<PostDetailMaxQuantityViewModel>> GetPostDetailWithMaxQuantityByUserId(Guid userId)
         {
-            var postDetail = await _appDbContext.Posts.Where(x=> x.CreatedBy == userId && x.IsDelete == false)
+            var postDetail = await _appDbContext.Posts.Where(x => x.CreatedBy == userId && x.IsDelete == false)
                                                       .Include(x => x.Product)
                                                       .ThenInclude(x => x.Category)
                                                       .AsSplitQuery()
@@ -400,6 +400,116 @@ namespace Infrastructure.Repository
                                                       }).ToListAsync();
             return postDetail;
 
+        }
+        public async Task<List<PostViewModel>> GetRandomPost(Guid userId)
+        {
+            // Get the prioritized posts and randomize them
+            var prioritizedPosts = await _appDbContext.Posts
+                .Where(x => x.IsDelete == false && x.CreatedBy != userId && x.IsPriority == true)
+                .OrderByDescending(p => p.CreationDate)
+                // Randomize
+                .Include(x => x.Product)
+                    .ThenInclude(p => p.Category)
+                .Include(x => x.Product)
+                    .ThenInclude(p => p.ConditionType)
+                .Include(x => x.Author)
+                .Select(x => new PostViewModel
+                {
+                    PostId = x.Id,
+                    PostContent = x.PostContent,
+                    PostTitle = x.PostTitle,
+                    CreationDate = DateOnly.FromDateTime(x.CreationDate.Value),
+                    AuthorId = x.UserId,
+                    Location = x.Author.HomeAddress,
+                    Product = new ProductModel
+                    {
+                        ProductId = x.ProductId,
+                        CategoryId = x.Product.CategoryId,
+                        CategoryName = x.Product.Category.CategoryName,
+                        ConditionId = x.Product.ConditionId,
+                        ConditionName = x.Product.ConditionType.ConditionType,
+                        ProductImageUrl = x.Product.ProductImageUrl,
+                        ProductPrice = x.Product.ProductPrice,
+                        ProductStatus = x.Product.ProductStatus,
+                        RequestedProduct = x.Product.RequestedProduct
+                    }
+                })
+                .AsNoTracking()
+                .Take(3)
+                .ToListAsync();
+            // Get the non-prioritized posts and sort them by CreationDate
+            var nonPrioritizedPosts = await _appDbContext.Posts
+                .Where(x => x.IsDelete == false && x.CreatedBy != userId && x.IsPriority == false)
+                .OrderByDescending(p => p.CreationDate)
+                .Include(x => x.Product)
+                    .ThenInclude(p => p.Category)
+                .Include(x => x.Product)
+                    .ThenInclude(p => p.ConditionType)
+                .Select(x => new PostViewModel
+                {
+                    PostId = x.Id,
+                    PostContent = x.PostContent,
+                    PostTitle = x.PostTitle,
+                    CreationDate = DateOnly.FromDateTime(x.CreationDate.Value),
+                    Location = _appDbContext.Users.Where(u => u.Id == x.CreatedBy).Select(u => u.HomeAddress).Single(),
+                    AuthorId = x.CreatedBy.Value,
+                    Product = new ProductModel
+                    {
+                        ProductId = x.ProductId,
+                        CategoryId = x.Product.CategoryId,
+                        CategoryName = x.Product.Category.CategoryName,
+                        ConditionId = x.Product.ConditionId,
+                        ConditionName = x.Product.ConditionType.ConditionType,
+                        ProductImageUrl = x.Product.ProductImageUrl,
+                        ProductPrice = x.Product.ProductPrice,
+                        ProductStatus = x.Product.ProductStatus,
+                        RequestedProduct = x.Product.RequestedProduct
+                    }
+                })
+                .AsNoTracking()
+                .Take(3)
+                .ToListAsync();
+
+            // Combine the lists, putting the randomized prioritized posts first
+            return prioritizedPosts.Concat(nonPrioritizedPosts).ToList();
+        }
+
+        public async Task<List<PostViewModel>> GetRecommendPostByWishlist(Guid userId)
+        {
+            List<PostViewModel> posts = new List<PostViewModel>();
+            var wishListPost = await _appDbContext.WishLists.Where(x => x.UserId == userId&&x.IsDelete==false).Select(x=>x.Post.Product.Category.CategoryName).ToListAsync();
+            if (wishListPost == null)
+            {
+                return null;
+            }
+            int countWishListPost = wishListPost.Count();
+            foreach(var category in wishListPost)
+            {
+                posts = await _appDbContext.Posts.Where(x => x.UserId != userId && x.IsDelete == false&& x.Product.Category.CategoryName == category)
+                                                 .Select(x=>new PostViewModel
+                                                 {
+                                                     PostId = x.Id,
+                                                     PostContent = x.PostContent,
+                                                     PostTitle = x.PostTitle,
+                                                     CreationDate = DateOnly.FromDateTime(x.CreationDate.Value),
+                                                     Location = _appDbContext.Users.Where(u => u.Id == x.CreatedBy).Select(u => u.HomeAddress).Single(),
+                                                     AuthorId = x.CreatedBy.Value,
+                                                     Product = new ProductModel
+                                                     {
+                                                         ProductId = x.ProductId,
+                                                         CategoryId = x.Product.CategoryId,
+                                                         CategoryName = x.Product.Category.CategoryName,
+                                                         ConditionId = x.Product.ConditionId,
+                                                         ConditionName = x.Product.ConditionType.ConditionType,
+                                                         ProductImageUrl = x.Product.ProductImageUrl,
+                                                         ProductPrice = x.Product.ProductPrice,
+                                                         ProductStatus = x.Product.ProductStatus,
+                                                         RequestedProduct = x.Product.RequestedProduct
+                                                     }
+                                                 })
+                                                .Take(1).ToListAsync();
+            }
+            return posts;
         }
     }
 }
