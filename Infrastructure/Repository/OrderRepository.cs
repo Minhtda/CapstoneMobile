@@ -63,7 +63,7 @@ namespace Infrastructure.Repository
 
         public async Task<List<SentOrderViewModel>> GetAllOrderByCreatedByUserId(Guid userId)
         {
-            var listOrder = await _dbContext.Orders.Where(x => x.IsDelete == false && x.CreatedBy == userId)
+            var listOrder = await _dbContext.Orders.Where(x => x.IsDelete == false && x.UserId == userId)
                                             .Include(x => x.User).ThenInclude(u => u.VerifyUser).AsSplitQuery()
                                             .Include(x => x.User).ThenInclude(u => u.Raters).AsSplitQuery()
                                             .Include(x => x.Post).AsSplitQuery()

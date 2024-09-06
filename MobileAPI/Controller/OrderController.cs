@@ -40,7 +40,7 @@ namespace MobileAPI.Controllers
         }
         [Authorize]
         [HttpPut]
-        public async Task<IActionResult> CheckedOrder(Guid orderId)
+        public async Task<IActionResult> AcceptedOrder(Guid orderId)
         {
            
                 var isAccepted = await _orderService.CheckOrder(orderId);
