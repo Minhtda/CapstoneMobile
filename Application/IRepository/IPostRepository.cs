@@ -23,5 +23,7 @@ namespace Application.InterfaceRepository
         Task<Post> GetBannedPostById(Guid postId);
         Task<List<PostViewModelForFeaturedImage>> GetFeaturedImagePost();
         Task<List<PostDetailMaxQuantityViewModel>> GetPostDetailWithMaxQuantityByUserId(Guid userId);
+        Task<List<PostViewModel>> GetRandomPost(Guid userId);
+        Task<List<PostViewModel>> GetRecommendPostByWishlist(Guid userId);
     }
 }

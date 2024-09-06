@@ -21,21 +21,28 @@ namespace Infrastructure.Repository
 
         public async Task<List<RatingViewModel>> GetAllRatingByRatedUserId(Guid ratedUserId)
         {
+            var distinctRaterCount = await _appDbContext.Ratings
+                        .Where(x => x.RatedUserId == ratedUserId && x.IsDelete == false)
+                       .Select(x => x.RaterId)
+                       .Distinct()
+                       .CountAsync();
+
             return await _appDbContext.Ratings.Where(x => x.RatedUserId == ratedUserId && x.IsDelete == false)
-                .Select(x=>new RatingViewModel
+                .Select(x => new RatingViewModel
                 {
-                    Email=x.Rater.Email,
-                    Username=x.Rater.UserName,
-                    RatingPoint=x.RatingPoint,
-                    RatingReview=x.ReviewContent,
-                    RatingTitle=x.RatingTitle
+                    Email = x.Rater.Email,
+                    Username = x.Rater.UserName,
+                    RatingPoint = x.RatingPoint,
+                    RatingReview = x.ReviewContent,
+                    RatingTitle = x.RatingTitle,
+                    RatingCount = distinctRaterCount
                 })
                 .ToListAsync();
         }
 
         public async Task<List<Rating>> GetAllRatingByRaterId(Guid raterId)
         {
-            return await _appDbContext.Ratings.Where(x => x.RaterId == raterId&&x.IsDelete==false).ToListAsync();
+            return await _appDbContext.Ratings.Where(x => x.RaterId == raterId && x.IsDelete == false).ToListAsync();
         }
     }
 }

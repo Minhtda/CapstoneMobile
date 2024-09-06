@@ -13,5 +13,6 @@ namespace Application.ViewModel.RatingModel
         public string RatingTitle { get; set; }
         public string RatingReview { get; set; }
         public double RatingPoint { get; set; }
+        public int RatingCount { get; set; }    
     }
 }

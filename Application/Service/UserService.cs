@@ -221,10 +221,7 @@ namespace Application.Service
                 string lastName = payload.FamilyName;
                 string pictureUrl = _ImageUrl;
                 var loginUser = await _unitOfWork.UserRepository.FindUserByEmail(email);
-                if (loginUser.IsDelete == true)
-                {
-                    throw new Exception("You have been banned");
-                }
+               
                 if (loginUser == null)
                 {
                     var newAcc = new User()
@@ -268,7 +265,10 @@ namespace Application.Service
                         await _unitOfWork.SaveChangeAsync();
                     }
                 }
-                
+                if (loginUser.IsDelete == true)
+                {
+                    throw new Exception("You have been banned");
+                }
                 var accessToken = loginUser.GenerateTokenString(_appConfiguration!.JWTSecretKey, _currentTime.GetCurrentTime());
                 var refreshToken = RefreshToken.GetRefreshToken();
 

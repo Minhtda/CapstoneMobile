@@ -74,6 +74,7 @@ namespace Infrastructure.Repository
             var user = await _dbContext.Users.Where(x => x.IsDelete == false && x.Id == userId)
                                             .Select(x => new UserDetailViewModel
                                             {
+                                                Id= x.Id,
                                                 Email=x.Email,  
                                                 Username=x.UserName,
                                                 Phonenumber=x.PhoneNumber,
