@@ -80,7 +80,8 @@ namespace Infrastructure.Repository
                                                 Phonenumber=x.PhoneNumber,
                                                 ProfileImage=x.ProfileImage,
                                                 Birthday=x.BirthDay.HasValue?DateOnly.FromDateTime(x.BirthDay.Value):DateOnly.FromDateTime(DateTime.UtcNow),
-                                                Fullname=x.FirstName+""+x.LastName
+                                                Fullname=x.FirstName+""+x.LastName,
+                                                Address = x.HomeAddress
                                             }).SingleAsync();
             return user;
         }

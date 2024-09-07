@@ -15,5 +15,6 @@ namespace Application.ViewModel.UserModel
         public string Fullname { get; set; }
         public string Phonenumber { get; set; }
         public DateOnly Birthday { get; set; }
+        public string Address { get; set; }
     }
 }
