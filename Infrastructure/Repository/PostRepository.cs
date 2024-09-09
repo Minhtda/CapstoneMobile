@@ -397,7 +397,7 @@ namespace Infrastructure.Repository
                                                               : 0),
                                                               AuthorImage = postAuthor.ProfileImage
                                                           }).Single()
-                                                      }).ToListAsync();
+                                                      }).Where(post => post.MaxQuantity > 0).ToListAsync();
             return postDetail;
 
         }
