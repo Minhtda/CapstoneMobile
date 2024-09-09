@@ -56,7 +56,7 @@ namespace Application.Service
                 var newWalletTransaction = new WalletTransaction
                 {
                     OrderId = order.Id,
-                    Amount = postForProductPrice.ProductPrice,
+                    Amount = postForProductPrice.ProductPrice * order.OrderQuantity + order.ShippingFee,
                     TransactionType = "Purchase pending",
                     WalletId = wallet.Id,
                 };
@@ -187,10 +187,11 @@ namespace Application.Service
                 if (walletTransaction != null)
                 {
                     var wallet = await _unitOfWork.WalletRepository.FindWalletByUserId(order.UserId);
-                    wallet.UserBalance -= post.ProductPrice;
+                    wallet.UserBalance -= post.ProductPrice*order.OrderQuantity;
+                    wallet.UserBalance -= order.ShippingFee;
                     var walletTransactionBuyer = new WalletTransaction
                     {
-                        Amount = post.ProductPrice,
+                        Amount = post.ProductPrice * order.OrderQuantity + order.ShippingFee,
                         TransactionType = "Purchase complete",
                         WalletId = wallet.Id
                     };
@@ -198,39 +199,16 @@ namespace Application.Service
                     _unitOfWork.WalletTransactionRepository.Update(walletTransaction);
                     _unitOfWork.WalletRepository.Update(wallet);
                     var walletPost = await _unitOfWork.WalletRepository.GetUserWalletByUserId(post.PostAuthor.AuthorId);
-                    walletPost.UserBalance += post.ProductPrice;
+                    walletPost.UserBalance += post.ProductPrice * order.OrderQuantity;
+                    walletPost.UserBalance += order.ShippingFee;
                     _unitOfWork.WalletRepository.Update(walletPost);
                     var walletTransactionPostOwner = new WalletTransaction
                     {
-                        Amount = post.ProductPrice,
+                        Amount = post.ProductPrice * order.OrderQuantity + order.ShippingFee,
                         TransactionType = "Product Sold",
                         WalletId = walletPost.Id
                     };
                     await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransactionPostOwner);
-                }
-            }
-            var rejectOrders = await _unitOfWork.OrderRepository.GetOrderByPostId(order.PostId);
-            if (rejectOrders != null && rejectOrders.Any())
-            {
-                foreach (var item in rejectOrders)
-                {
-                    if (item.Id != order.Id)
-                    {
-                        item.OrderStatusId = _reject;
-                        _unitOfWork.OrderRepository.Update(item);
-                        var walletTransaction = await _unitOfWork.WalletTransactionRepository.GetByOrderIdAsync(item.Id);
-                        if (walletTransaction != null)
-                        {
-                            WalletTransaction newWalletTransaction = new WalletTransaction
-                            {
-                                Amount = walletTransaction.Amount,
-                                OrderId = orderId,
-                                WalletId = walletTransaction.WalletId,
-                                TransactionType = "Purchase denied"
-                            };
-                            await _unitOfWork.WalletTransactionRepository.AddAsync(newWalletTransaction);
-                        }
-                    }
                 }
             }
             return await _unitOfWork.SaveChangeAsync() > 0;
