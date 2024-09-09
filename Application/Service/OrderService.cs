@@ -367,10 +367,6 @@ namespace Application.Service
         public async Task<bool> CreateOrder(CreateOrderModel createOrderModel)
         {
             var checkOrders = await _unitOfWork.OrderRepository.GetOrderByPostId(createOrderModel.PostId);
-            if (checkOrders != null && checkOrders.Any(item => item.OrderStatusId == _confirm))
-            {
-                throw new Exception("This post has already been sold");
-            }
             var productId = await _unitOfWork.PostRepository.GetProductIdFromPostId(createOrderModel.PostId);
             var product = await _unitOfWork.ProductRepository.GetByIdAsync(productId);
             if (product.ProductQuantity - checkOrders.Where(o => o.OrderStatusId == _accept || o.OrderStatusId == _received).Sum(o => (int?)o.OrderQuantity ?? 0) < createOrderModel.Quantity)
