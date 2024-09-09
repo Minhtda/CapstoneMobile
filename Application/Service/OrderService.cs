@@ -40,16 +40,16 @@ namespace Application.Service
             {
                 throw new Exception("Order not found");
             }
-            var wallet = await _unitOfWork.WalletRepository.GetUserWalletByUserId(order.UserId);
-            var wallletTransaction = await _unitOfWork.WalletTransactionRepository.GetAllTransactionByUserId(order.UserId);
             var postForProductPrice = await _unitOfWork.PostRepository.GetPostDetail(order.PostId);
-            if (postForProductPrice.ConditionTypeId == 1)
+            if (postForProductPrice.ProductPrice * order.OrderQuantity + order.ShippingFee != 0)
             {
+                var wallet = await _unitOfWork.WalletRepository.GetUserWalletByUserId(order.UserId);
+                var wallletTransaction = await _unitOfWork.WalletTransactionRepository.GetAllTransactionByUserId(order.UserId);
                 float pendingTransaction = wallletTransaction?.Where(item => item.Action == "Purchase pending").Sum(item => item.Amount) ?? 0;
                 float cancleTransaction = wallletTransaction?.Where(item => item.Action == "Cancelled Pending").Sum(item => item.Amount) ?? 0;
                 float deniedTransaction = wallletTransaction?.Where(item => item.Action == "Purchase denied").Sum(item => item.Amount) ?? 0;
                 float completeTransaction = wallletTransaction?.Where(item => item.Action == "Purchase complete").Sum(item => item.Amount) ?? 0;
-                if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction + completeTransaction < postForProductPrice.ProductPrice*order.OrderQuantity + order.ShippingFee)
+                if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction + completeTransaction < postForProductPrice.ProductPrice * order.OrderQuantity + order.ShippingFee)
                 {
                     throw new Exception("You don't have enough money to order this post");
                 }
