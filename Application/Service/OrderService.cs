@@ -49,7 +49,7 @@ namespace Application.Service
                 float cancleTransaction = wallletTransaction?.Where(item => item.Action == "Cancelled Pending").Sum(item => item.Amount) ?? 0;
                 float deniedTransaction = wallletTransaction?.Where(item => item.Action == "Purchase denied").Sum(item => item.Amount) ?? 0;
                 float completeTransaction = wallletTransaction?.Where(item => item.Action == "Purchase complete").Sum(item => item.Amount) ?? 0;
-                if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction + completeTransaction < postForProductPrice.ProductPrice)
+                if (wallet.UserBalance - pendingTransaction + cancleTransaction + deniedTransaction + completeTransaction < postForProductPrice.ProductPrice*order.OrderQuantity + order.ShippingFee)
                 {
                     throw new Exception("You don't have enough money to order this post");
                 }
