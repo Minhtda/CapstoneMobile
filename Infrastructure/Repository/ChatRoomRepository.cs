@@ -93,10 +93,8 @@ namespace Infrastructure.Repository
                                                      .FirstOrDefaultAsync();
             if (chatRoom == null)
             {
-                return null; // Or handle the case when the chat room is not found
+                return null; 
             }
-
-            // Fetch users for all CreatedBy user IDs in the messages
             var userIds = chatRoom.Messages
                 .Where(m => m.CreatedBy.HasValue)
                 .Select(m => m.CreatedBy.Value)
@@ -116,8 +114,8 @@ namespace Infrastructure.Repository
                 ReceiverId = chatRoom.ReceiverId,
                 SenderName = chatRoom.Sender.UserName,
                 ReceiverName = chatRoom.Receiver.UserName,
-                SenderAvatar = chatRoom.Sender.ProfileImage,  // Add this line
-                ReceiverAvatar = chatRoom.Receiver.ProfileImage,  // Add this line
+                SenderAvatar = chatRoom.Sender.ProfileImage,  
+                ReceiverAvatar = chatRoom.Receiver.ProfileImage, 
                 Messages = chatRoom.Messages.Select(message => new MessageDto
                 {
                     messageId = message.Id,
@@ -128,10 +126,11 @@ namespace Infrastructure.Repository
                                         : "Unknown User",
                     Avatar = message.CreatedBy.HasValue && users.ContainsKey(message.CreatedBy.Value)
                                         ? users[message.CreatedBy.Value].ProfileImage
-                                        : "Unknown Avatar",  // Add this line
+                                        : "Unknown Avatar",  
                     CreatedDate = message.CreationDate.Value.ToShortDateString(),
                     CreatedTime = message.CreationDate.Value.ToShortTimeString()
-                }).OrderBy(m => m.CreatedDate).ToList(),
+                }).OrderBy(m => m.CreatedDate)
+                       .ThenBy(m => m.CreatedTime).ToList(),
                 Order = orders.Select(order => new OrderDto
                 {
                     OrderId = order.Id,
