@@ -129,8 +129,7 @@ namespace Infrastructure.Repository
                                         : "Unknown Avatar",  
                     CreatedDate = message.CreationDate.Value.ToShortDateString(),
                     CreatedTime = message.CreationDate.Value.ToShortTimeString()
-                }).OrderBy(m => m.CreatedDate)
-                       .ThenBy(m => m.CreatedTime).ToList(),
+                }).OrderBy(m => DateTime.Parse(m.CreatedDate + " " + m.CreatedTime)).ToList(),
                 Order = orders.Select(order => new OrderDto
                 {
                     OrderId = order.Id,
