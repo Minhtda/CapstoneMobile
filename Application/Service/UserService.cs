@@ -78,15 +78,32 @@ namespace Application.Service
             await _unitOfWork.UserRepository.AddAsync(newAccount);
             await _unitOfWork.SaveChangeAsync();
             var loginUser = await _unitOfWork.UserRepository.FindUserByEmail(registerModel.Email);
-            if (loginUser.VerifyUserId == null)
+            if (loginUser.Email.Contains("@fpt.edu.vn"))
             {
                 var verifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserIdForRegister(loginUser.Id);
                 if (verifyUser == null)
                 {
                     var verifyUserId = await CreateVerifyUser(loginUser.Id);
+                    var newVerifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserIdForRegister(loginUser.Id);
+                    newVerifyUser.VerifyStatusId = 2;
+                    _unitOfWork.VerifyUsersRepository.Update(newVerifyUser);
                     loginUser.VerifyUserId = verifyUserId;
                     _unitOfWork.UserRepository.Update(loginUser);
                     await _unitOfWork.SaveChangeAsync();
+                }
+            }
+            else
+            {
+                if (loginUser.VerifyUserId == null)
+                {
+                    var verifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserIdForRegister(loginUser.Id);
+                    if (verifyUser == null)
+                    {
+                        var verifyUserId = await CreateVerifyUser(loginUser.Id);
+                        loginUser.VerifyUserId = verifyUserId;
+                        _unitOfWork.UserRepository.Update(loginUser);
+                        await _unitOfWork.SaveChangeAsync();
+                    }
                 }
             }
             if (loginUser.WalletId == Guid.Empty||loginUser.WalletId==null)
@@ -243,15 +260,32 @@ namespace Application.Service
                     var changesSaved = await _unitOfWork.SaveChangeAsync();
                     loginUser = await _unitOfWork.UserRepository.FindUserByEmail(email);
                 }
-                if (loginUser.VerifyUserId == null)
+                if (loginUser.Email.Contains("@fpt.edu.vn"))
                 {
                     var verifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserIdForRegister(loginUser.Id);
                     if (verifyUser == null)
                     {
                         var verifyUserId = await CreateVerifyUser(loginUser.Id);
+                        var newVerifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserIdForRegister(loginUser.Id);
+                        newVerifyUser.VerifyStatusId = 2;
+                        _unitOfWork.VerifyUsersRepository.Update(newVerifyUser);
                         loginUser.VerifyUserId = verifyUserId;
                         _unitOfWork.UserRepository.Update(loginUser);
                         await _unitOfWork.SaveChangeAsync();
+                    }
+                }
+                else
+                {
+                    if (loginUser.VerifyUserId == null)
+                    {
+                        var verifyUser = await _unitOfWork.VerifyUsersRepository.FindVerifyUserIdByUserIdForRegister(loginUser.Id);
+                        if (verifyUser == null)
+                        {
+                            var verifyUserId = await CreateVerifyUser(loginUser.Id);
+                            loginUser.VerifyUserId = verifyUserId;
+                            _unitOfWork.UserRepository.Update(loginUser);
+                            await _unitOfWork.SaveChangeAsync();
+                        }
                     }
                 }
                 if (loginUser.WalletId == Guid.Empty)
