@@ -26,12 +26,6 @@ jobs:
 
       - name: dotnet publish
         run: dotnet publish MobileAPI/MobileAPI.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
       - name: Delete Old Artifacts
         uses: actions/github-script@v6
         id: artifact
@@ -50,6 +44,12 @@ jobs:
               artifact_id: id,
               })
             })
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+  
   deploy:
     runs-on: windows-latest
     needs: build
