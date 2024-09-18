@@ -32,7 +32,24 @@ jobs:
         with:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
+      - name: Delete Old Artifacts
+        uses: actions/github-script@v6
+        id: artifact
+        with:
+         script: |
+            const res = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
 
+            res.data.artifacts
+             .forEach(({ id }) => {
+            github.rest.actions.deleteArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: id,
+              })
+            })
   deploy:
     runs-on: windows-latest
     needs: build
