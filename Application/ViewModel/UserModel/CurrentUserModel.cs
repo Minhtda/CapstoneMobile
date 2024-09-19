@@ -17,6 +17,7 @@ namespace Application.ViewModel.UserModel
         public double Rating { get; set; }
         public DateOnly?Birthday { get; set; }
         public string VerifyStatus { get; set; }
+        public int TotalUserRate { get; set; }  
         
     }
 }

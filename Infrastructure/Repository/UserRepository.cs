@@ -36,6 +36,11 @@ namespace Infrastructure.Repository
 
         public async Task<CurrentUserModel> GetCurrentLoginUserAsync(Guid userId)
         {
+            var distinctRaterCount = await _dbContext.Ratings
+                       .Where(x => x.RatedUserId == userId && x.IsDelete == false)
+                      .Select(x => x.RaterId)
+                      .Distinct()
+                      .CountAsync();
 #pragma warning disable CS8603 // Possible null reference return.
             return await _dbContext.Users.Where(x => x.Id == userId).Include(x=>x.VerifyUser).AsSplitQuery().Include(x=>x.RatedUsers).Select(x => new CurrentUserModel
             {
@@ -48,7 +53,8 @@ namespace Infrastructure.Repository
                 Phonenumber=x.PhoneNumber,
                 Rating=x.RatedUsers.Count()>0?
                 x.RatedUsers.Sum(rate=>rate.RatingPoint)/x.RatedUsers.Count():0,
-                VerifyStatus=x.VerifyUser.VerificationStatus.VerificationStatusName
+                VerifyStatus=x.VerifyUser.VerificationStatus.VerificationStatusName,
+                TotalUserRate=distinctRaterCount
             }).SingleOrDefaultAsync();
 #pragma warning restore CS8603 // Possible null reference return.
         }
