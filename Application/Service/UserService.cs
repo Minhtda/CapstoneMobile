@@ -252,7 +252,6 @@ namespace Application.Service
                         PasswordHash = " ",
                         PhoneNumber = " ",
                         ProfileImage = pictureUrl,
-                        IsBuisnessAccount = false,
                         HomeAddress="HCM",
                         WalletId = new Guid(),
                     };
@@ -509,7 +508,6 @@ namespace Application.Service
                         PasswordHash = " ",
                         PhoneNumber = " ",
                         ProfileImage = pictureUrl,
-                        IsBuisnessAccount = false,
                         HomeAddress = "string",
                         WalletId = new Guid(),
                     };
@@ -541,7 +539,7 @@ namespace Application.Service
                 }
                 if (machineToken != null)
                 {
-                    loginUser.Token = machineToken;
+                    /*loginUser.Token = machineToken;*/
                     _unitOfWork.UserRepository.Update(loginUser);
                     await _unitOfWork.SaveChangeAsync();
                 }
@@ -586,7 +584,7 @@ namespace Application.Service
             }
             if (machineToken != null)
             {
-                user.Token = machineToken;
+                /*user.Token = machineToken;*/
                 _unitOfWork.UserRepository.Update(user);
                 await _unitOfWork.SaveChangeAsync();
             }
