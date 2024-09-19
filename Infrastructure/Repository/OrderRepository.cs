@@ -90,6 +90,18 @@ namespace Infrastructure.Repository
                                                     SenderRating = (u.RatedUsers.Count() > 0
                                                                  ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()) : 0),
                                                     SenderUsername = u.UserName
+                                                }).Single(),
+                                                PostAuthor= _dbContext.Posts.Where(pa=>pa.UserId==userId).Select(pa=>new PostAuthor
+                                                {
+                                                    AuthorId=userId,
+                                                    AuthorImage=pa.Author.ProfileImage,
+                                                    CreatedDate=DateOnly.FromDateTime(pa.CreationDate.Value),
+                                                    Email=pa.Author.Email,
+                                                    FulName=pa.Author.FirstName+""+pa.Author.LastName,
+                                                    HomeAddress=pa.Author.HomeAddress,
+                                                    PhoneNumber=pa.Author.PhoneNumber,
+                                                    Rating= pa.Author.RatedUsers.Count() > 0 ?
+                                                    pa.Author.RatedUsers.Sum(rate => rate.RatingPoint) / pa.Author.RatedUsers.Count() : 0
                                                 }).Single()
                                             }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
             return listOrder;

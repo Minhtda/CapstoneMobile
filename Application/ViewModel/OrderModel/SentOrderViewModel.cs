@@ -18,5 +18,6 @@ namespace Application.ViewModel.OrderModel
         public int Quantity { get; set; }
         public PostViewModelForOrder Post { get; set; }
         public UserViewModelForOrder User { get; set; }
+        public PostAuthor PostAuthor { get; set; }
     }
 }
