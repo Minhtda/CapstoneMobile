@@ -233,7 +233,19 @@ namespace Infrastructure.Repository
                                                       SenderRating= (x.User.RatedUsers.Count() > 0
                                                                   ? x.User.RatedUsers.Sum(r => r.RatingPoint) / (x.User.RatedUsers.Count()) : 0),
                                                       SenderUsername=x.User.UserName
-                                                  }
+                                                  },
+                                                  PostAuthor= _dbContext.Posts.Where(post=>post.UserId==x.UserId).Select(post=>new PostAuthor
+                                                  {
+                                                      AuthorId=post.UserId,
+                                                      AuthorImage=post.Author.ProfileImage,
+                                                      CreatedDate=DateOnly.FromDateTime(post.CreationDate.Value),
+                                                       Email=post.Author.Email,
+                                                       FulName=post.Author.FirstName+""+post.Author.LastName,
+                                                       HomeAddress=post.Author.HomeAddress,
+                                                       PhoneNumber=post.Author.PhoneNumber,
+                                                       Rating = post.Author.RatedUsers.Count() > 0 ?
+                                                    post.Author.RatedUsers.Sum(rate => rate.RatingPoint) / post.Author.RatedUsers.Count() : 0
+                                                  }).Single()
                                               }).SingleAsync();
             return detail;
         }
