@@ -51,9 +51,10 @@ namespace Infrastructure.Repository
                 Fullname = x.FirstName + " " + x.LastName,
                 UserProfileImage=x.ProfileImage,
                 Phonenumber=x.PhoneNumber,
-                Rating=x.RatedUsers.Count()>0?
-                x.RatedUsers.Sum(rate=>rate.RatingPoint)/x.RatedUsers.Count():0,
-                VerifyStatus=x.VerifyUser.VerificationStatus.VerificationStatusName,
+                Rating = x.RatedUsers.Count() > 0
+    ? Math.Round(x.RatedUsers.Sum(rate => rate.RatingPoint) / (double)x.RatedUsers.Count(), 1)
+    : 0,
+            VerifyStatus = x.VerifyUser.VerificationStatus.VerificationStatusName,
                 TotalUserRate=distinctRaterCount
             }).SingleOrDefaultAsync();
 #pragma warning restore CS8603 // Possible null reference return.

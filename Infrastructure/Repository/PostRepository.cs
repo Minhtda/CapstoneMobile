@@ -188,7 +188,7 @@ namespace Infrastructure.Repository
                                                               PhoneNumber = postAuthor.PhoneNumber,
                                                               HomeAddress = postAuthor.HomeAddress,
                                                               Rating = (postAuthor.RatedUsers.Count() > 0
-                                                              ? postAuthor.RatedUsers.Sum(r => r.RatingPoint) / (postAuthor.RatedUsers.Count())
+                                                              ? Math.Round(postAuthor.RatedUsers.Sum(r => r.RatingPoint) / (postAuthor.RatedUsers.Count()), 1)
                                                               : 0),
                                                               AuthorImage = postAuthor.ProfileImage
                                                           }).Single()
@@ -393,7 +393,7 @@ namespace Infrastructure.Repository
                                                               PhoneNumber = postAuthor.PhoneNumber,
                                                               HomeAddress = postAuthor.HomeAddress,
                                                               Rating = (postAuthor.RatedUsers.Count() > 0
-                                                              ? postAuthor.RatedUsers.Sum(r => r.RatingPoint) / (postAuthor.RatedUsers.Count())
+                                                              ? Math.Round(postAuthor.RatedUsers.Sum(r => r.RatingPoint) / (postAuthor.RatedUsers.Count()),1)
                                                               : 0),
                                                               AuthorImage = postAuthor.ProfileImage
                                                           }).Single()
