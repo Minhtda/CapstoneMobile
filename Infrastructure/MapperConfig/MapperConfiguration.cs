@@ -72,7 +72,6 @@ namespace Infrastructure.MapperConfig
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(x => x.PostId))
                 .ReverseMap()
                 .ForMember(dest => dest.Product, opt => opt.MapFrom(x => x.Product))
-                .ForMember(dest => dest.Product.Quantity, opt => opt.MapFrom(x => x.Product.ProductQuantity))
                 .ForMember(dest => dest.CreationDate, opt => opt.MapFrom(x => new DateOnly(x.CreationDate.GetValueOrDefault().Year, x.CreationDate.GetValueOrDefault().Month, x.CreationDate.GetValueOrDefault().Day)))
                 .ForMember(dest => dest.AuthorId, opt => opt.MapFrom(x => x.CreatedBy))
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(x => x.Author.HomeAddress))
