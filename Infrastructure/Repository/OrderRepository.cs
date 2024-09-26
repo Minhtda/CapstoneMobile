@@ -246,7 +246,7 @@ namespace Infrastructure.Repository
                                                                   ? x.User.RatedUsers.Sum(r => r.RatingPoint) / (x.User.RatedUsers.Count()) : 0),
                                                       SenderUsername=x.User.UserName
                                                   },
-                                                  PostAuthor= _dbContext.Posts.Where(post=>post.UserId==x.UserId).Select(post=>new PostAuthor
+                                                  PostAuthor= _dbContext.Posts.Where(post=>post.UserId==x.Post.UserId).Select(post=>new PostAuthor
                                                   {
                                                       AuthorId=post.UserId,
                                                       AuthorImage=post.Author.ProfileImage,
@@ -317,7 +317,7 @@ namespace Infrastructure.Repository
                                                      SenderRating = (u.RatedUsers.Count() > 0
                                                                   ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()) : 0),
                                                      SenderUsername = u.UserName
-                                                 }).Single()
+                                                 }).SingleOrDefault()
                                              }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
             return listOrder;
         }
@@ -367,7 +367,7 @@ namespace Infrastructure.Repository
                                                      SenderRating = (u.RatedUsers.Count() > 0
                                                                   ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()) : 0),
                                                      SenderUsername = u.UserName
-                                                 }).Single()
+                                                 }).SingleOrDefault()
                                              }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
             return listOrder;
         }
@@ -417,7 +417,7 @@ namespace Infrastructure.Repository
                                                      SenderRating = (u.RatedUsers.Count() > 0
                                                                   ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()) : 0),
                                                      SenderUsername = u.UserName
-                                                 }).Single()
+                                                 }).SingleOrDefault()
                                              }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
             return listOrder;
         }
@@ -467,7 +467,7 @@ namespace Infrastructure.Repository
                                                      SenderRating = (u.RatedUsers.Count() > 0
                                                                   ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()) : 0),
                                                      SenderUsername = u.UserName
-                                                 }).Single()
+                                                 }).SingleOrDefault()
                                              }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
             return listOrder;
         }
