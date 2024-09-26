@@ -82,7 +82,15 @@ namespace Infrastructure.Repository
                                                     PostTitle = x.Post.PostTitle,
                                                     Product=new ProductModel
                                                     {
-                                                        CategoryName=x.Post.Product.Category.CategoryName
+                                                        CategoryId = x.Post.Product.CategoryId,
+                                                        CategoryName = x.Post.Product.Category.CategoryName,
+                                                        ConditionId = x.Post.Product.ConditionId,
+                                                        ConditionName = x.Post.Product.ConditionType.ConditionType,
+                                                        ProductId = x.Post.Product.Id,
+                                                        ProductImageUrl = x.Post.Product.ProductImageUrl,
+                                                        ProductPrice = x.Post.Product.ProductPrice,
+                                                        ProductStatus = x.Post.Product.ProductStatus,
+                                                        RequestedProduct = x.Post.Product.RequestedProduct
                                                     }
                                                 },
                                                 User = _dbContext.Users.Where(u => u.Id == x.UserId).AsSplitQuery().Select(u => new UserViewModelForOrder
@@ -190,7 +198,7 @@ namespace Infrastructure.Repository
                                                      SenderRating = (u.RatedUsers.Count() > 0
                                                                   ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()): 0),
                                                      SenderUsername=u.UserName
-                                                 }).Single()
+                                                 }).SingleOrDefault()
                                              }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
             return listOrder;
         }
@@ -249,8 +257,8 @@ namespace Infrastructure.Repository
                                                        PhoneNumber=post.Author.PhoneNumber,
                                                        Rating = post.Author.RatedUsers.Count() > 0 ?
                                                     Math.Round(post.Author.RatedUsers.Sum(rate => rate.RatingPoint) / post.Author.RatedUsers.Count(),1) : 0
-                                                  }).Single()
-                                              }).SingleAsync();
+                                                  }).SingleOrDefault()
+                                              }).SingleOrDefaultAsync();
             return detail;
         }
 
