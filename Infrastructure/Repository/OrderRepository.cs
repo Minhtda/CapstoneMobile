@@ -63,7 +63,7 @@ namespace Infrastructure.Repository
 
         public async Task<List<SentOrderViewModel>> GetAllOrderByCreatedByUserId(Guid userId)
         {
-            var listOrder = await _dbContext.Orders.Where(x => x.IsDelete == false && x.UserId == userId)
+            var listOrder = await _dbContext.Orders.Where(x => x.IsDelete == false && x.CreatedBy == userId)
                                             .Include(x => x.User).ThenInclude(u => u.VerifyUser).AsSplitQuery()
                                             .Include(x => x.User).ThenInclude(u => u.Raters).AsSplitQuery()
                                             .Include(x => x.Post).AsSplitQuery()
@@ -79,7 +79,11 @@ namespace Infrastructure.Repository
                                                 {
                                                     PostId = x.PostId,
                                                     PostContent = x.Post.PostContent,
-                                                    PostTitle = x.Post.PostTitle
+                                                    PostTitle = x.Post.PostTitle,
+                                                    Product=new ProductModel
+                                                    {
+                                                        CategoryName=x.Post.Product.Category.CategoryName
+                                                    }
                                                 },
                                                 User = _dbContext.Users.Where(u => u.Id == x.UserId).AsSplitQuery().Select(u => new UserViewModelForOrder
                                                 {
@@ -90,8 +94,8 @@ namespace Infrastructure.Repository
                                                     SenderRating = (u.RatedUsers.Count() > 0
                                                                  ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()) : 0),
                                                     SenderUsername = u.UserName
-                                                }).Single(),
-                                                PostAuthor= _dbContext.Posts.Where(pa=>pa.UserId==userId).Select(pa=>new PostAuthor
+                                                }).SingleOrDefault(),
+                                                PostAuthor= _dbContext.Posts.Where(pa=>pa.UserId==x.Post.UserId).Select(pa=>new PostAuthor
                                                 {
                                                     AuthorId=userId,
                                                     AuthorImage=pa.Author.ProfileImage,
@@ -102,7 +106,7 @@ namespace Infrastructure.Repository
                                                     PhoneNumber=pa.Author.PhoneNumber,
                                                     Rating= pa.Author.RatedUsers.Count() > 0 ?
                                                    Math.Round( pa.Author.RatedUsers.Sum(rate => rate.RatingPoint) / pa.Author.RatedUsers.Count(),1) : 0
-                                                }).Single()
+                                                }).SingleOrDefault()
                                             }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
             return listOrder;
         }
