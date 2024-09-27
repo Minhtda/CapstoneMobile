@@ -395,7 +395,8 @@ namespace Application.Service
 
         public async Task<List<PostViewModelForFeaturedImage>> GetFeaturedImage()
         {
-            var post = await _unitOfWork.PostRepository.GetFeaturedImagePost();
+
+            var post = await _unitOfWork.PostRepository.GetFeaturedImagePost(_claimService.GetCurrentUserId);
             return post;
         }
 
