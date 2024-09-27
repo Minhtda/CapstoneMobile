@@ -52,8 +52,8 @@ namespace Infrastructure.Repository
                 UserProfileImage=x.ProfileImage,
                 Phonenumber=x.PhoneNumber,
                 Rating = x.RatedUsers.Count() > 0
-    ? Math.Round(x.RatedUsers.Sum(rate => rate.RatingPoint) / (double)x.RatedUsers.Count(), 1)
-    : 0,
+? Math.Ceiling(x.RatedUsers.Sum(rate => rate.RatingPoint) / (double)x.RatedUsers.Count())
+: 0,
             VerifyStatus = x.VerifyUser.VerificationStatus.VerificationStatusName,
                 TotalUserRate=distinctRaterCount
             }).SingleOrDefaultAsync();

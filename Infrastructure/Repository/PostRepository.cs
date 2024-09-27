@@ -393,7 +393,7 @@ namespace Infrastructure.Repository
                                                               PhoneNumber = postAuthor.PhoneNumber,
                                                               HomeAddress = postAuthor.HomeAddress,
                                                               Rating = (postAuthor.RatedUsers.Count() > 0
-                                                              ? Math.Round(postAuthor.RatedUsers.Sum(r => r.RatingPoint) / (postAuthor.RatedUsers.Count()),1)
+                                                              ? Math.Ceiling(postAuthor.RatedUsers.Sum(r => r.RatingPoint) / (postAuthor.RatedUsers.Count()))
                                                               : 0),
                                                               AuthorImage = postAuthor.ProfileImage
                                                           }).Single()

@@ -32,7 +32,7 @@ namespace Infrastructure.Repository
                 {
                     Email = x.Rater.Email,
                     Username = x.Rater.UserName,
-                    RatingPoint = x.RatingPoint,
+                    RatingPoint = Math.Ceiling(x.RatingPoint),
                     RatingReview = x.ReviewContent,
                     RatingTitle = x.RatingTitle,
                     RatingCount = distinctRaterCount

@@ -315,7 +315,7 @@ namespace Infrastructure.Repository
                                                      SenderHomeAddress = u.HomeAddress,
                                                      SenderImageUrl = u.ProfileImage,
                                                      SenderRating = (u.RatedUsers.Count() > 0
-                                                                  ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()) : 0),
+                                                                  ? Math.Ceiling( u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count())) : 0),
                                                      SenderUsername = u.UserName
                                                  }).SingleOrDefault()
                                              }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
@@ -365,7 +365,7 @@ namespace Infrastructure.Repository
                                                      SenderHomeAddress = u.HomeAddress,
                                                      SenderImageUrl = u.ProfileImage,
                                                      SenderRating = (u.RatedUsers.Count() > 0
-                                                                  ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()) : 0),
+                                                                  ?Math.Ceiling(u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count())) : 0),
                                                      SenderUsername = u.UserName
                                                  }).SingleOrDefault()
                                              }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
@@ -415,7 +415,7 @@ namespace Infrastructure.Repository
                                                      SenderHomeAddress = u.HomeAddress,
                                                      SenderImageUrl = u.ProfileImage,
                                                      SenderRating = (u.RatedUsers.Count() > 0
-                                                                  ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()) : 0),
+                                                                  ?Math.Ceiling(u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count())) : 0),
                                                      SenderUsername = u.UserName
                                                  }).SingleOrDefault()
                                              }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
@@ -465,7 +465,7 @@ namespace Infrastructure.Repository
                                                      SenderHomeAddress = u.HomeAddress,
                                                      SenderImageUrl = u.ProfileImage,
                                                      SenderRating = (u.RatedUsers.Count() > 0
-                                                                  ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()) : 0),
+                                                                  ?Math.Ceiling( u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count())) : 0),
                                                      SenderUsername = u.UserName
                                                  }).SingleOrDefault()
                                              }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
@@ -499,7 +499,7 @@ namespace Infrastructure.Repository
                                                     SenderHomeAddress = u.HomeAddress,
                                                     SenderImageUrl = u.VerifyUser.UserImage,
                                                     SenderRating = (u.RatedUsers.Count() > 0
-                                                                 ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()) : 0),
+                                                                 ? Math.Ceiling(u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count())) : 0),
                                                     SenderUsername = u.UserName
                                                 }).Single()
                                             }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
