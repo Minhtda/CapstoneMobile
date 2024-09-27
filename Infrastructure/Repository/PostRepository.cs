@@ -324,9 +324,9 @@ namespace Infrastructure.Repository
             return await _appDbContext.Posts.Where(x => x.IsDelete == true && x.Id == postId).SingleAsync();
         }
 
-        public async Task<List<PostViewModelForFeaturedImage>> GetFeaturedImagePost()
+        public async Task<List<PostViewModelForFeaturedImage>> GetFeaturedImagePost(Guid userId)
         {
-            var postsQuery = _appDbContext.Posts.Where(x => x.IsPriority == true).Where(x => x.IsDelete == false)
+            var postsQuery = _appDbContext.Posts.Where(x => x.IsPriority == true).Where(x => x.IsDelete == false).Where(x=> x.UserId != userId)
                                         .Include(x => x.Product)
                                         .AsSplitQuery();
 
@@ -334,7 +334,7 @@ namespace Infrastructure.Repository
             {
                 return await _appDbContext.Posts.Where(x => x.IsDelete == false)
                                    .Include(x => x.Product)
-                                   .AsSplitQuery()
+                                   .AsSplitQuery().Where(x => x.UserId != userId)
                                    // Random order
                                    .Select(x => new PostViewModelForFeaturedImage
                                    {

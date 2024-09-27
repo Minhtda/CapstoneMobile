@@ -21,7 +21,7 @@ namespace Application.InterfaceRepository
         Task<Guid> GetProductIdFromPostId(Guid postId);
         Task<List<PostViewModelForWeb>> GetAllPostForWebAsync();
         Task<Post> GetBannedPostById(Guid postId);
-        Task<List<PostViewModelForFeaturedImage>> GetFeaturedImagePost();
+        Task<List<PostViewModelForFeaturedImage>> GetFeaturedImagePost(Guid id);
         Task<List<PostDetailMaxQuantityViewModel>> GetPostDetailWithMaxQuantityByUserId(Guid userId);
         Task<List<PostViewModel>> GetRandomPost(Guid userId);
         Task<List<PostViewModel>> GetRecommendPostByWishlist(Guid userId);
