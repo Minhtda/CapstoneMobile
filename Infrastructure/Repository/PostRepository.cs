@@ -383,7 +383,7 @@ namespace Infrastructure.Repository
                                                           ProductPrice = x.Product.ProductPrice,
                                                           MaxQuantity = x.Product.ProductQuantity.Value
                                                           - x.Requests
-                                                                    .Where(o => o.OrderStatusId == 2 || o.OrderStatusId == 6 || o.OrderStatusId == 2)
+                                                                    .Where(o => o.OrderStatusId == 2 || o.OrderStatusId == 6 || o.OrderStatusId == 1)
                                                                     .Sum(o => (int?)o.OrderQuantity ?? 0),
                                                           CategoryId = x.Product.CategoryId.Value,
                                                           CategoryName = x.Product.Category.CategoryName,
