@@ -326,35 +326,42 @@ namespace Infrastructure.Repository
 
         public async Task<List<PostViewModelForFeaturedImage>> GetFeaturedImagePost(Guid userId)
         {
-            var postsQuery = _appDbContext.Posts.Where(x => x.IsPriority == true).Where(x => x.IsDelete == false).Where(x=> x.UserId != userId)
-                                        .Include(x => x.Product)
-                                        .AsSplitQuery();
-
-            if (!await postsQuery.AnyAsync())
+            var priorityPosts = await _appDbContext.Posts
+                                           .Where(x => x.IsPriority == true && x.IsDelete == false)
+                                           .Include(x => x.Product)
+                                           .AsSplitQuery()
+                                           .OrderBy(x => Guid.NewGuid())
+                                           .Select(x => new PostViewModelForFeaturedImage
+                                           {
+                                               PostId = x.Id,
+                                               CreationDate = x.CreationDate.HasValue
+                                                   ? DateOnly.FromDateTime(x.CreationDate.Value)
+                                                   : DateOnly.FromDateTime(DateTime.Now),
+                                               ImageUrl = x.Product.ProductImageUrl
+                                           }).AsNoTracking()
+                                           .Take(3)
+                                           .ToListAsync();
+            if (priorityPosts.Count < 3)
             {
-                return await _appDbContext.Posts.Where(x => x.IsDelete == false)
-                                   .Include(x => x.Product)
-                                   .AsSplitQuery().Where(x => x.UserId != userId)
-                                   // Random order
-                                   .Select(x => new PostViewModelForFeaturedImage
-                                   {
-                                       PostId = x.Id,
-                                       CreationDate = DateOnly.FromDateTime(x.CreationDate.Value),
-                                       ImageUrl = x.Product.ProductImageUrl
-                                   }).AsNoTracking()
-                                   .Take(3) // Take 3 random posts
-                                   .ToListAsync();
+                var additionalPosts = await _appDbContext.Posts
+                                                         .Where(x => x.IsPriority == false && x.IsDelete == false)
+                                                         .Include(x => x.Product)
+                                                         .AsSplitQuery()
+                                                         .OrderBy(x => Guid.NewGuid())
+                                                         .Select(x => new PostViewModelForFeaturedImage
+                                                         {
+                                                             PostId = x.Id,
+                                                             CreationDate = x.CreationDate.HasValue
+                                                                 ? DateOnly.FromDateTime(x.CreationDate.Value)
+                                                                 : DateOnly.FromDateTime(DateTime.Now),
+                                                             ImageUrl = x.Product.ProductImageUrl
+                                                         }).AsNoTracking()
+                                                         .Take(3 - priorityPosts.Count)
+                                                         .ToListAsync();
+                priorityPosts.AddRange(additionalPosts);
             }
 
-            return await postsQuery // Random order
-                                   .Select(x => new PostViewModelForFeaturedImage
-                                   {
-                                       PostId = x.Id,
-                                       CreationDate = DateOnly.FromDateTime(x.CreationDate.Value),
-                                       ImageUrl = x.Product.ProductImageUrl
-                                   }).AsNoTracking()
-                                   .Take(3) // Take 3 random posts
-                                   .ToListAsync();
+            return priorityPosts;
         }
         public async Task<List<PostDetailMaxQuantityViewModel>> GetPostDetailWithMaxQuantityByUserId(Guid userId)
         {

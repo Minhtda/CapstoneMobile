@@ -70,7 +70,6 @@ namespace Infrastructure.Repository
             }).AsSplitQuery().AsQueryable().AsNoTracking().SingleOrDefaultAsync();
             return currentUser;
         }
-
         public async Task<User> GetBannedUserById(Guid id)
         {
             var user = await _dbContext.Users.Where(x => x.IsDelete == true && x.Id == id).Include(x=>x.Role).SingleAsync();
