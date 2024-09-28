@@ -54,7 +54,7 @@ namespace Infrastructure.Repository
                                                     SenderHomeAddress = u.HomeAddress,
                                                     SenderImageUrl = u.VerifyUser.UserImage,
                                                     SenderRating = (u.RatedUsers.Count() > 0
-                                                                 ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()) : 0),
+                                                                 ?Math.Ceiling( u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count())) : 0),
                                                     SenderUsername = u.UserName
                                                 }).Single()
                                             }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
@@ -113,7 +113,7 @@ namespace Infrastructure.Repository
                                                     HomeAddress=pa.Author.HomeAddress,
                                                     PhoneNumber=pa.Author.PhoneNumber,
                                                     Rating= pa.Author.RatedUsers.Count() > 0 ?
-                                                   Math.Round( pa.Author.RatedUsers.Sum(rate => rate.RatingPoint) / pa.Author.RatedUsers.Count(),1) : 0
+                                                   Math.Ceiling( pa.Author.RatedUsers.Sum(rate => rate.RatingPoint) / pa.Author.RatedUsers.Count()) : 0
                                                 }).SingleOrDefault()
                                             }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
             return listOrder;
@@ -196,7 +196,7 @@ namespace Infrastructure.Repository
                                                      SenderHomeAddress = u.HomeAddress,
                                                      SenderImageUrl = u.ProfileImage,
                                                      SenderRating = (u.RatedUsers.Count() > 0
-                                                                  ? u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count()): 0),
+                                                                  ?Math.Ceiling( u.RatedUsers.Sum(r => r.RatingPoint) / (u.RatedUsers.Count())): 0),
                                                      SenderUsername=u.UserName
                                                  }).SingleOrDefault()
                                              }).AsQueryable().AsNoTracking().OrderByDescending(x => x.CreationDate).ToListAsync();
@@ -256,7 +256,7 @@ namespace Infrastructure.Repository
                                                        HomeAddress=post.Author.HomeAddress,
                                                        PhoneNumber=post.Author.PhoneNumber,
                                                        Rating = post.Author.RatedUsers.Count() > 0 ?
-                                                    Math.Round(post.Author.RatedUsers.Sum(rate => rate.RatingPoint) / post.Author.RatedUsers.Count(),1) : 0
+                                                    Math.Ceiling(post.Author.RatedUsers.Sum(rate => rate.RatingPoint) / post.Author.RatedUsers.Count()) : 0
                                                   }).SingleOrDefault()
                                               }).SingleOrDefaultAsync();
             return detail;
